@@ -1,18 +1,35 @@
 :root {
-    --bg: #050505;
-    --bg-soft: #111111;
-    --panel: rgba(18, 18, 18, 0.82);
-    --panel-strong: rgba(0, 0, 0, 0.88);
-    --card: #121212;
-    --card-2: #1b1b1b;
-    --text: #f5f5f5;
-    --muted: #b7b7b7;
-    --primary: #ffffff;
-    --primary-2: #d7d7d7;
-    --accent: #ececec;
-    --border: rgba(255, 255, 255, 0.08);
-    --shadow: 0 25px 70px rgba(0, 0, 0, 0.6);
-    --radius: 26px;
+  --bg: #f8f8f8;
+  --bg-soft: #f0f0f0;
+  --panel: rgba(240, 240, 240, 0.95);
+  --panel-strong: rgba(255, 255, 255, 0.98);
+  --card: #ffffff;
+  --card-2: #f5f5f5;
+  --text: #1a1a1a;
+  --muted: #686868;
+  --primary: #000000;
+  --primary-2: #333333;
+  --accent: #1a1a1a;
+  --border: rgba(0, 0, 0, 0.08);
+  --shadow: 0 25px 70px rgba(0, 0, 0, 0.08);
+  --radius: 26px;
+  --transition: all 0.3s ease;
+}
+
+[data-theme="dark"] {
+  --bg: #050505;
+  --bg-soft: #111111;
+  --panel: rgba(18, 18, 18, 0.82);
+  --panel-strong: rgba(0, 0, 0, 0.88);
+  --card: #121212;
+  --card-2: #1b1b1b;
+  --text: #f5f5f5;
+  --muted: #b7b7b7;
+  --primary: #ffffff;
+  --primary-2: #d7d7d7;
+  --accent: #ececec;
+  --border: rgba(255, 255, 255, 0.08);
+  --shadow: 0 25px 70px rgba(0, 0, 0, 0.6);
 }
 
 * {
@@ -27,12 +44,20 @@ html {
 
 body {
     font-family: Inter, "Segoe UI", sans-serif;
+    color: var(--text);
+    line-height: 1.6;
+    transition: background-color 0.4s ease, color 0.4s ease;
+    background:
+        radial-gradient(circle at top left, rgba(0, 0, 0, 0.04), transparent 28%),
+        radial-gradient(circle at right center, rgba(0, 0, 0, 0.02), transparent 24%),
+        linear-gradient(135deg, #fafafa 0%, #f5f5f5 40%, #f0f0f0 100%);
+}
+
+[data-theme="dark"] body {
     background:
         radial-gradient(circle at top left, rgba(255, 255, 255, 0.08), transparent 28%),
         radial-gradient(circle at right center, rgba(255, 255, 255, 0.04), transparent 24%),
         linear-gradient(135deg, #030303 0%, #0b0b0b 40%, #121212 100%);
-    color: var(--text);
-    line-height: 1.6;
 }
 
 a {
@@ -60,13 +85,14 @@ img {
     gap: 8px;
     padding: 7px 14px;
     border: 1px solid var(--border);
-    background: rgba(124, 140, 255, 0.08);
+    background: var(--bg-soft);
     border-radius: 999px;
-    color: var(--primary-2);
+    color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 0.14em;
     font-size: 0.7rem;
     font-weight: 700;
+    transition: var(--transition);
 }
 
 .eyebrow::before {
@@ -74,8 +100,8 @@ img {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--primary-2));
-    box-shadow: 0 0 16px rgba(124, 140, 255, 0.9);
+    background: var(--primary);
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
 }
 
 h1,
@@ -83,10 +109,13 @@ h2,
 h3 {
     letter-spacing: -0.04em;
     line-height: 1.06;
+    color: var(--text);
+    transition: color 0.3s ease;
 }
 
 p {
     color: var(--muted);
+    transition: color 0.3s ease;
 }
 
 .site-header {
@@ -94,8 +123,9 @@ p {
     top: 0;
     z-index: 20;
     backdrop-filter: blur(18px);
-    background: rgba(5, 11, 20, 0.5);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    transition: var(--transition);
 }
 
 .navbar {
@@ -112,6 +142,8 @@ p {
     font-weight: 750;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+    color: var(--text);
+    transition: color 0.3s ease;
 }
 
 .brand-mark {
@@ -120,10 +152,11 @@ p {
     border-radius: 14px;
     display: grid;
     place-items: center;
-    background: linear-gradient(135deg, #ffffff, #a7a7a7);
-    color: #050505;
-    box-shadow: 0 18px 30px rgba(255, 255, 255, 0.18);
+    background: var(--primary);
+    color: var(--bg);
+    box-shadow: 0 18px 30px rgba(0, 0, 0, 0.15);
     font-weight: 900;
+    transition: var(--transition);
 }
 
 .nav-menu {
@@ -142,10 +175,35 @@ p {
     color: var(--text);
 }
 
+.nav-menu a.active {
+    color: var(--text);
+    font-weight: 600;
+    border-bottom: 2px solid var(--primary);
+    padding-bottom: 2px;
+}
+
 .nav-actions {
     display: flex;
     align-items: center;
     gap: 16px;
+}
+
+.theme-toggle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 1.2rem;
+}
+
+.theme-toggle:hover {
+    background: var(--card-2);
 }
 
 .btn {
@@ -156,8 +214,9 @@ p {
     border-radius: 999px;
     padding: 0.95rem 1.5rem;
     font-weight: 700;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    transition: var(--transition);
     cursor: pointer;
+    font-size: 0.95rem;
 }
 
 .btn:hover {
@@ -165,15 +224,20 @@ p {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #ffffff, #d4d4d4);
-    color: #050505;
-    box-shadow: 0 20px 45px rgba(255, 255, 255, 0.1);
+    background: var(--primary);
+    color: var(--bg);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15);
 }
 
 .btn-secondary {
     border-color: var(--border);
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--card);
     color: var(--text);
+    transition: var(--transition);
+}
+
+.btn-secondary:hover {
+    background: var(--card-2);
 }
 
 .hero {
@@ -253,22 +317,31 @@ p {
     border-radius: 50%;
     filter: blur(8px);
     opacity: 0.75;
+    transition: var(--transition);
 }
 
 .orb.one {
     width: 300px;
     height: 300px;
-    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.04));
+    background: radial-gradient(circle at 30% 30%, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.01));
     top: 40px;
     right: 35px;
+}
+
+[data-theme="dark"] .orb.one {
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.04));
 }
 
 .orb.two {
     width: 220px;
     height: 220px;
-    background: radial-gradient(circle at 30% 30%, rgba(202, 202, 202, 0.28), rgba(255, 255, 255, 0.04));
+    background: radial-gradient(circle at 30% 30%, rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.01));
     bottom: 60px;
     left: 20px;
+}
+
+[data-theme="dark"] .orb.two {
+    background: radial-gradient(circle at 30% 30%, rgba(202, 202, 202, 0.28), rgba(255, 255, 255, 0.04));
 }
 
 .profile-card {
@@ -277,19 +350,21 @@ p {
     padding: 32px 24px 18px;
     border-radius: 34px;
     border: 1px solid var(--border);
-    background: linear-gradient(180deg, rgba(13, 27, 42, 0.8), rgba(11, 18, 32, 0.9));
+    background: var(--card);
     box-shadow: var(--shadow);
+    transition: var(--transition);
 }
 
 .avatar {
     height: 430px;
     border-radius: 26px;
     background:
-        radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.24), transparent 18%),
-        linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02), rgba(17, 17, 17, 0.95));
-    border: 1px solid rgba(255, 255, 255, 0.08);
+        radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.12), transparent 18%),
+        linear-gradient(135deg, var(--card-2), var(--bg-soft));
+    border: 1px solid var(--border);
     position: relative;
     overflow: hidden;
+    transition: var(--transition);
 }
 
 .avatar::before {
@@ -298,11 +373,11 @@ p {
     width: 210px;
     height: 210px;
     border-radius: 50%;
-    background: rgba(10, 17, 28, 0.72);
+    background: var(--bg);
     bottom: 28px;
     left: 50%;
     transform: translateX(-50%);
-    border: 12px solid rgba(255, 255, 255, 0.08);
+    border: 12px solid var(--border);
 }
 
 .avatar::after {
@@ -314,7 +389,7 @@ p {
     font-size: 5rem;
     font-weight: 800;
     letter-spacing: -0.08em;
-    color: rgba(255, 255, 255, 0.92);
+    color: var(--text);
 }
 
 .badge {
@@ -325,15 +400,21 @@ p {
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    background: rgba(9, 17, 29, 0.82);
+    background: var(--bg);
     border: 1px solid var(--border);
     border-radius: 16px;
+    transition: var(--transition);
 }
 
 .badge-dot {
     width: 12px;
     height: 12px;
     border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 22px rgba(34, 197, 94, 0.6);
+}
+
+[data-theme="dark"] .badge-dot {
     background: #7ef7b1;
     box-shadow: 0 0 22px rgba(126, 247, 177, 0.8);
 }
@@ -341,6 +422,7 @@ p {
 .badge strong {
     display: block;
     font-size: 0.82rem;
+    color: var(--text);
 }
 
 .badge span {
@@ -373,13 +455,14 @@ p {
 }
 
 .about-card {
-    background: linear-gradient(180deg, rgba(18, 31, 48, 0.9), rgba(11, 18, 32, 0.9));
+    background: var(--card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     min-height: 420px;
     position: relative;
     overflow: hidden;
     box-shadow: var(--shadow);
+    transition: var(--transition);
 }
 
 .about-visual {
@@ -461,11 +544,12 @@ p {
 .project-card,
 .contact-card,
 .timeline-item {
-    background: linear-gradient(180deg, rgba(16, 27, 45, 0.9), rgba(12, 19, 31, 0.9));
+    background: var(--card);
     border: 1px solid var(--border);
     border-radius: 24px;
     padding: 28px 22px;
     box-shadow: var(--shadow);
+    transition: var(--transition);
 }
 
 .service-icon {
@@ -474,10 +558,11 @@ p {
     border-radius: 18px;
     display: grid;
     place-items: center;
-    background: linear-gradient(135deg, rgba(124, 140, 255, 0.18), rgba(85, 214, 255, 0.18));
-    color: var(--primary-2);
+    background: var(--bg-soft);
+    color: var(--text);
     font-size: 1.5rem;
     margin-bottom: 18px;
+    transition: var(--transition);
 }
 
 .service-card h3,
@@ -508,7 +593,8 @@ p {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    background: var(--primary);
+    transition: var(--transition);
 }
 
 .projects-grid {
@@ -676,7 +762,8 @@ p {
 
 .site-footer {
     padding: 26px 0 40px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid var(--border);
+    transition: var(--transition);
 }
 
 .footer-row {
@@ -700,7 +787,14 @@ p {
     place-items: center;
     border-radius: 50%;
     border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--card);
+    transition: var(--transition);
+    color: var(--muted);
+}
+
+.socials a:hover {
+    background: var(--card-2);
+    color: var(--text);
 }
 
 @media (max-width: 900px) {

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Proyectos de Jhonn - Trabajos destacados en diseño y desarrollo web." />
+    <title>Jhonn | Proyectos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <script>
+        const theme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+    </script>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container navbar">
+            <a href="index.html" class="brand" aria-label="Inicio">
+                <span class="brand-mark">JH</span>
+                <span>Jhonn</span>
+            </a>
+
+            <nav class="nav-menu" aria-label="Navegación principal">
+                <a href="index.html">Inicio</a>
+                <a href="about.html">Sobre</a>
+                <a href="services.html">Servicios</a>
+                <a href="projects.html">Proyectos</a>
+                <a href="experience.html">Experiencia</a>
+                <a href="contact.html">Contacto</a>
+            </nav>
+
+            <div class="nav-actions">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema"></button>
+                <a class="btn btn-secondary" href="projects.html">Ver trabajos</a>
+                <a class="btn btn-primary" href="contact.html">Hablemos</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="section" id="proyectos">
+            <div class="container">
+                <div class="section-heading">
+                    <div>
+                        <span class="eyebrow">Proyectos</span>
+                        <h2>Trabajos que combinan estilo y funcionalidad.</h2>
+                    </div>
+                </div>
+
+                <div class="projects-grid">
+                    <article class="project-card">
+                        <div class="project-visual" aria-label="Proyecto 1"></div>
+                        <div class="project-body">
+                            <div class="tags">
+                                <span class="tag">UI</span>
+                                <span class="tag">UX</span>
+                            </div>
+                            <h3>Brand Studio</h3>
+                            <p>Diseño de marca y sitio web para una agencia creativa con enfoque premium.</p>
+                            <a href="#" class="link-row">Ver proyecto <span>→</span></a>
+                        </div>
+                    </article>
+
+                    <article class="project-card">
+                        <div class="project-visual" aria-label="Proyecto 2"></div>
+                        <div class="project-body">
+                            <div class="tags">
+                                <span class="tag">Web</span>
+                                <span class="tag">Marketing</span>
+                            </div>
+                            <h3>Launch Agency</h3>
+                            <p>Landing page estratégica para lanzar una marca con un mensaje claro y fuerte.</p>
+                            <a href="#" class="link-row">Ver proyecto <span>→</span></a>
+                        </div>
+                    </article>
+
+                    <article class="project-card">
+                        <div class="project-visual" aria-label="Proyecto 3"></div>
+                        <div class="project-body">
+                            <div class="tags">
+                                <span class="tag">App</span>
+                                <span class="tag">E-commerce</span>
+                            </div>
+                            <h3>Nova Store</h3>
+                            <p>Experiencia digital moderna para comercio electrónico con alto foco en ventas.</p>
+                            <a href="#" class="link-row">Ver proyecto <span>→</span></a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-row">
+            <p>© 2026 Jhonn. Todos los derechos reservados.</p>
+            <div class="socials" aria-label="Redes sociales">
+                <a href="#" aria-label="Instagram">◎</a>
+                <a href="#" aria-label="LinkedIn">◍</a>
+                <a href="#" aria-label="GitHub">◌</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="theme.js"></script>
+</body>
+
+</html>
