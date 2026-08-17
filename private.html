@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Página privada - Contenido personal dedicado." />
+    <title>Jhonn | Private</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <script>
+        const theme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+    </script>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        .pin-screen {
+            position: fixed;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            background: var(--bg);
+            z-index: 9999;
+        }
+
+        .pin-container {
+            width: min(420px, 90%);
+            text-align: center;
+        }
+
+        .pin-lock-icon {
+            font-size: 3.5rem;
+            margin-bottom: 24px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .pin-container h1 {
+            font-size: 1.8rem;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+
+        .pin-container p {
+            color: var(--muted);
+            margin-bottom: 32px;
+            font-size: 0.95rem;
+        }
+
+        .pin-input-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            justify-content: center;
+        }
+
+        .pin-input {
+            width: 60px;
+            height: 60px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            background: var(--card);
+            color: var(--text);
+            text-align: center;
+            letter-spacing: 0.15em;
+            transition: var(--transition);
+        }
+
+        .pin-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] .pin-input:focus {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        .pin-input::placeholder {
+            color: var(--border);
+        }
+
+        .pin-button {
+            width: 100%;
+            padding: 14px 24px;
+            background: var(--primary);
+            color: var(--bg);
+            border: none;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .pin-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15);
+        }
+
+        .pin-error {
+            color: #ef4444;
+            font-size: 0.9rem;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .pin-error.show {
+            display: block;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .private-content {
+            display: none;
+        }
+
+        .private-content.unlocked {
+            display: block;
+        }
+
+        .unlock-button {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 12px 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            color: var(--muted);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 100;
+        }
+
+        .unlock-button:hover {
+            background: var(--card-2);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- PIN Screen -->
+    <div class="pin-screen" id="pinScreen">
+        <div class="pin-container">
+            <div class="pin-lock-icon">🔒</div>
+            <h1>Contenido Privado</h1>
+            <p>Ingresa el PIN para acceder</p>
+
+            <div class="pin-input-group">
+                <input type="password" class="pin-input" maxlength="1" placeholder="•" id="pin1" />
+                <input type="password" class="pin-input" maxlength="1" placeholder="•" id="pin2" />
+                <input type="password" class="pin-input" maxlength="1" placeholder="•" id="pin3" />
+                <input type="password" class="pin-input" maxlength="1" placeholder="•" id="pin4" />
+            </div>
+
+            <button class="pin-button" id="pinSubmit">Desbloquear</button>
+            <div class="pin-error" id="pinError">PIN incorrecto, intenta de nuevo</div>
+        </div>
+    </div>
+
+    <!-- Private Content -->
+    <div class="private-content" id="privateContent">
+        <header class="site-header">
+            <div class="container navbar">
+                <a href="index.html" class="brand" aria-label="Inicio">
+                    <span class="brand-mark">JH</span>
+                    <span>Jhonn</span>
+                </a>
+
+                <nav class="nav-menu" aria-label="Navegación principal">
+                    <a href="index.html">Inicio</a>
+                    <a href="about.html">Sobre</a>
+                    <a href="services.html">Servicios</a>
+                    <a href="projects.html">Proyectos</a>
+                    <a href="experience.html">Experiencia</a>
+                    <a href="contact.html">Contacto</a>
+                </nav>
+
+                <div class="nav-actions">
+                    <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema"></button>
+                    <a class="btn btn-secondary" href="index.html">Volver</a>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <section class="section" id="private">
+                <div class="container">
+                    <div class="section-heading">
+                        <div>
+                            <span class="eyebrow">Mi Espacio Privado</span>
+                            <h2>Un rincón especial para momentos inolvidables.</h2>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 48px;">
+                        <!-- Card 1: Galería -->
+                        <div class="service-card">
+                            <div class="service-icon">🖼️</div>
+                            <h3>Galería de Momentos</h3>
+                            <p>Fotos y recuerdos especiales que queremos guardar y compartir.</p>
+                            <ul>
+                                <li>Viajes juntos</li>
+                                <li>Momentos cotidianos</li>
+                                <li>Instantes mágicos</li>
+                            </ul>
+                        </div>
+
+                        <!-- Card 2: Dedicatoria -->
+                        <div class="service-card">
+                            <div class="service-icon">💝</div>
+                            <h3>Dedicatoria Especial</h3>
+                            <p>Palabras que quiero que sepas, escritas desde mi corazón.</p>
+                            <p style="margin-top: 16px; font-style: italic; color: var(--text);">
+                                "Eres la persona más importante en mi vida. Gracias por ser tú,
+                                por estar, por creer en mí. Te amo infinito."
+                            </p>
+                        </div>
+
+                        <!-- Card 3: Timeline -->
+                        <div class="service-card">
+                            <div class="service-icon">📅</div>
+                            <h3>Nuestro Timeline</h3>
+                            <p>Fechas importantes y momentos que marcaron nuestra historia.</p>
+                            <ul>
+                                <li>Primer encuentro</li>
+                                <li>Momentos decisivos</li>
+                                <li>Sueños compartidos</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Special Message Section -->
+                    <div style="margin-top: 64px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px; text-align: center;">
+                        <h2 style="margin-bottom: 16px;">Te Quiero</h2>
+                        <p style="font-size: 1.1rem; color: var(--muted); line-height: 1.8;">
+                            En este espacio privado, quería tener un lugar solo para nosotros.
+                            Un lugar donde expresar lo que siento, guardar nuestros momentos,
+                            y recordar por qué eres tan importante en mi vida.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <div class="container footer-row">
+                <p>© 2026 Jhonn. Contenido Privado 🔒</p>
+                <div class="socials" aria-label="Redes sociales">
+                    <a href="#" aria-label="Contáctame">💌</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="theme.js"></script>
+    <script src="private.js"></script>
+</body>
+
+</html>
