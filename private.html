@@ -502,6 +502,56 @@
             color: white;
         }
 
+        .bucket-text {
+            flex: 1;
+        }
+
+        .bucket-delete {
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px 8px;
+            transition: var(--transition);
+        }
+
+        .bucket-delete:hover {
+            color: #ef4444;
+            transform: scale(1.15);
+        }
+
+        .bucket-add-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .bucket-add-row input {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg-soft);
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        .bucket-add-row button {
+            padding: 10px 18px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #ef4444, #ec4899);
+            color: #fff;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .bucket-add-row button:hover {
+            transform: translateY(-2px);
+        }
+
         /* Botón sorpresa */
         .surprise-btn {
             display: block;
@@ -1092,13 +1142,11 @@
                     <div style="margin-top: 40px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px;">
                         <h2 style="text-align: center; margin-bottom: 8px;">Nuestra bucket list</h2>
                         <p style="text-align: center; color: var(--muted);">Cosas que quiero hacer contigo, Sol</p>
-                        <ul class="bucket-list" id="bucketList">
-                            <li data-id="1"><span class="bucket-check"></span><span>Hacer un viaje juntos</span></li>
-                            <li data-id="2"><span class="bucket-check"></span><span>Cocinar una cena especial en casa</span></li>
-                            <li data-id="3"><span class="bucket-check"></span><span>Ver un atardecer completo juntos</span></li>
-                            <li data-id="4"><span class="bucket-check"></span><span>Conocer un lugar nuevo los dos</span></li>
-                            <li data-id="5"><span class="bucket-check"></span><span>Tener una noche de películas sin celular</span></li>
-                        </ul>
+                        <ul class="bucket-list" id="bucketList"></ul>
+                        <form class="bucket-add-row" id="bucketAddForm">
+                            <input type="text" id="bucketInput" placeholder="Agrega algo que quieras hacer juntos..." maxlength="80" required />
+                            <button type="submit">Agregar</button>
+                        </form>
                     </div>
 
                     <!-- Botón Sorpresa -->
@@ -1254,21 +1302,6 @@
                 setTimeout(() => {
                     resultEl.textContent = `💌 ${dates[sliceIndex]}`;
                 }, 4000);
-            });
-        }
-
-        // Bucket list persistente
-        function initBucketList() {
-            const items = document.querySelectorAll('#bucketList li');
-            items.forEach(item => {
-                const id = 'bucket_' + item.dataset.id;
-                if (localStorage.getItem(id) === 'done') {
-                    item.classList.add('done');
-                }
-                item.addEventListener('click', () => {
-                    item.classList.toggle('done');
-                    localStorage.setItem(id, item.classList.contains('done') ? 'done' : 'pending');
-                });
             });
         }
 
@@ -1436,9 +1469,73 @@
             initGallery();
             initQuiz();
             initWheel();
-            initBucketList();
             initSurprise();
             initMusic();
+        });
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import {
+            getFirestore, collection, addDoc, deleteDoc, doc,
+            updateDoc, onSnapshot, query, orderBy, serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnscQX92Otfn6hY2wmf2uDEq6ehnTZqXY",
+            authDomain: "jhonn-sol.firebaseapp.com",
+            projectId: "jhonn-sol",
+            storageBucket: "jhonn-sol.firebasestorage.app",
+            messagingSenderId: "362632634651",
+            appId: "1:362632634651:web:f88ce4a55eaf196f99b3be"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const bucketRef = collection(db, 'bucketList');
+        const bucketQuery = query(bucketRef, orderBy('createdAt', 'asc'));
+
+        const listEl = document.getElementById('bucketList');
+        const form = document.getElementById('bucketAddForm');
+        const input = document.getElementById('bucketInput');
+
+        function renderItem(id, data) {
+            const li = document.createElement('li');
+            li.className = data.done ? 'done' : '';
+            li.innerHTML = `
+                <span class="bucket-check"></span>
+                <span class="bucket-text"></span>
+                <button type="button" class="bucket-delete" title="Eliminar">🗑️</button>
+            `;
+            li.querySelector('.bucket-text').textContent = data.text;
+
+            li.querySelector('.bucket-check').addEventListener('click', () => {
+                updateDoc(doc(db, 'bucketList', id), { done: !data.done });
+            });
+            li.querySelector('.bucket-text').addEventListener('click', () => {
+                updateDoc(doc(db, 'bucketList', id), { done: !data.done });
+            });
+            li.querySelector('.bucket-delete').addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteDoc(doc(db, 'bucketList', id));
+            });
+
+            return li;
+        }
+
+        onSnapshot(bucketQuery, (snapshot) => {
+            listEl.innerHTML = '';
+            snapshot.forEach((docSnap) => {
+                listEl.appendChild(renderItem(docSnap.id, docSnap.data()));
+            });
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = input.value.trim();
+            if (!text) return;
+            await addDoc(bucketRef, { text, done: false, createdAt: serverTimestamp() });
+            input.value = '';
         });
     </script>
 </body>
