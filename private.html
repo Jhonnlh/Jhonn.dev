@@ -2165,9 +2165,9 @@
                     updateButtonIcon(e.data.isPaused);
                     const progress = e.data.duration ? e.data.position / e.data.duration : 0;
                     ringFill.style.strokeDashoffset = String(CIRCUMFERENCE * (1 - progress));
-                    if (!e.data.isPaused && e.data.duration && e.data.position >= e.data.duration - 750 && !endHandled) {
+                    if (!e.data.isPaused && e.data.duration && progress >= 0.998 && !endHandled) {
                         endHandled = true;
-                        playQueueItem(currentIndex + 1);
+                        setTimeout(() => playQueueItem(currentIndex + 1), 300);
                     }
                 });
             }
