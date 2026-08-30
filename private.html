@@ -292,6 +292,139 @@
             border: 1px solid var(--border);
             background: linear-gradient(135deg, var(--bg-soft), var(--card-2));
             transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gallery-delete {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(0, 0, 0, 0.55);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: grid;
+            place-items: center;
+        }
+
+        .gallery-upload-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .gallery-upload-row input[type="file"] {
+            flex: 1;
+            min-width: 180px;
+            color: var(--text);
+        }
+
+        .gallery-upload-row button {
+            padding: 10px 18px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #ef4444, #ec4899);
+            color: #fff;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .gallery-upload-row button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Notas / mensajes */
+        .messages-list {
+            list-style: none;
+            display: grid;
+            gap: 12px;
+            margin: 20px 0;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .message-item {
+            background: var(--bg-soft);
+            border-radius: 14px;
+            padding: 14px 44px 14px 16px;
+            position: relative;
+        }
+
+        .message-item strong {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--text);
+        }
+
+        .message-item p {
+            color: var(--text);
+            white-space: pre-wrap;
+        }
+
+        .message-delete {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--muted);
+            transition: var(--transition);
+        }
+
+        .message-delete:hover {
+            color: #ef4444;
+            transform: scale(1.15);
+        }
+
+        .message-form {
+            display: grid;
+            gap: 10px;
+        }
+
+        .message-form input,
+        .message-form textarea {
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg-soft);
+            color: var(--text);
+            font-family: inherit;
+        }
+
+        .message-form textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .message-form button {
+            padding: 10px 18px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #ef4444, #ec4899);
+            color: #fff;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .message-form button:hover {
+            transform: translateY(-2px);
         }
 
         .gallery-item:hover {
@@ -1047,17 +1180,11 @@
                     <div style="margin-top: 40px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px;">
                         <h2 style="text-align: center; margin-bottom: 8px;">Galería de momentos</h2>
                         <p style="text-align: center; color: var(--muted);">Un espacio para nuestras fotos favoritas</p>
-                        <div class="gallery-grid" id="galleryGrid">
-                            <div class="gallery-item" data-photo="📸">📸</div>
-                            <div class="gallery-item" data-photo="🌅">🌅</div>
-                            <div class="gallery-item" data-photo="🎡">🎡</div>
-                            <div class="gallery-item" data-photo="🍕">🍕</div>
-                            <div class="gallery-item" data-photo="🎬">🎬</div>
-                            <div class="gallery-item" data-photo="🌙">🌙</div>
-                        </div>
-                        <p style="text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 16px;">
-                            Reemplaza estos espacios por sus fotos reales cuando quieras.
-                        </p>
+                        <div class="gallery-grid" id="galleryGrid"></div>
+                        <form class="gallery-upload-row" id="galleryUploadForm">
+                            <input type="file" id="galleryInput" accept="image/*" required />
+                            <button type="submit">Subir foto</button>
+                        </form>
                     </div>
 
                     <!-- Nuestra Playlist -->
@@ -1107,6 +1234,18 @@
                                 <span>Agrega aquí esa anécdota que siempre los hace reír</span>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Notas para el otro -->
+                    <div style="margin-top: 40px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px;">
+                        <h2 style="text-align: center; margin-bottom: 8px;">Notas para el otro 💌</h2>
+                        <p style="text-align: center; color: var(--muted);">Déjense mensajes que quieran leer después</p>
+                        <ul class="messages-list" id="messagesList"></ul>
+                        <form class="message-form" id="messageForm">
+                            <input type="text" id="messageAuthor" placeholder="Tu nombre" maxlength="20" required />
+                            <textarea id="messageText" placeholder="Escribe tu mensaje..." maxlength="300" required></textarea>
+                            <button type="submit">Enviar mensaje</button>
+                        </form>
                     </div>
 
                     <!-- Quiz -->
@@ -1252,9 +1391,14 @@
             const lightbox = document.getElementById('lightbox');
             const lightboxBox = document.getElementById('lightboxBox');
             document.getElementById('galleryGrid').addEventListener('click', (e) => {
+                if (e.target.closest('.gallery-delete')) return;
                 const item = e.target.closest('.gallery-item');
                 if (!item) return;
-                lightboxBox.textContent = item.dataset.photo;
+                if (item.dataset.url) {
+                    lightboxBox.innerHTML = `<img src="${item.dataset.url}" style="width:100%;height:100%;object-fit:contain;" />`;
+                } else {
+                    lightboxBox.textContent = item.dataset.photo || '📸';
+                }
                 lightbox.classList.add('open');
             });
             lightbox.addEventListener('click', () => lightbox.classList.remove('open'));
@@ -1536,6 +1680,122 @@
             if (!text) return;
             await addDoc(bucketRef, { text, done: false, createdAt: serverTimestamp() });
             input.value = '';
+        });
+
+        // Galería con fotos reales (comprimidas y guardadas como Base64 en Firestore, sin Storage)
+        const galleryRef = collection(db, 'gallery');
+        const galleryQuery = query(galleryRef, orderBy('createdAt', 'asc'));
+        const galleryGrid = document.getElementById('galleryGrid');
+        const galleryForm = document.getElementById('galleryUploadForm');
+        const galleryInput = document.getElementById('galleryInput');
+
+        function compressImage(file, maxSize = 800, quality = 0.7) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const img = new Image();
+                    img.onload = () => {
+                        let { width, height } = img;
+                        if (width > height && width > maxSize) {
+                            height = Math.round(height * (maxSize / width));
+                            width = maxSize;
+                        } else if (height > maxSize) {
+                            width = Math.round(width * (maxSize / height));
+                            height = maxSize;
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.onerror = reject;
+                    img.src = reader.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderGalleryItem(id, data) {
+            const div = document.createElement('div');
+            div.className = 'gallery-item';
+            div.dataset.url = data.url;
+            div.innerHTML = `
+                <img src="${data.url}" alt="Foto" />
+                <button type="button" class="gallery-delete" title="Eliminar">🗑️</button>
+            `;
+            div.querySelector('.gallery-delete').addEventListener('click', async (e) => {
+                e.stopPropagation();
+                await deleteDoc(doc(db, 'gallery', id));
+            });
+            return div;
+        }
+
+        onSnapshot(galleryQuery, (snapshot) => {
+            galleryGrid.innerHTML = '';
+            snapshot.forEach((docSnap) => {
+                galleryGrid.appendChild(renderGalleryItem(docSnap.id, docSnap.data()));
+            });
+        });
+
+        galleryForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const file = galleryInput.files[0];
+            if (!file) return;
+            const submitBtn = galleryForm.querySelector('button');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Subiendo...';
+            try {
+                const url = await compressImage(file);
+                await addDoc(galleryRef, { url, createdAt: serverTimestamp() });
+                galleryForm.reset();
+            } catch {
+                alert('No se pudo subir la foto, intenta con otra imagen.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Subir foto';
+            }
+        });
+
+        // Notas / mensajes entre ambos
+        const messagesRef = collection(db, 'messages');
+        const messagesQuery = query(messagesRef, orderBy('createdAt', 'desc'));
+        const messagesList = document.getElementById('messagesList');
+        const messageForm = document.getElementById('messageForm');
+        const messageAuthor = document.getElementById('messageAuthor');
+        const messageText = document.getElementById('messageText');
+
+        function renderMessage(id, data) {
+            const li = document.createElement('li');
+            li.className = 'message-item';
+            li.innerHTML = `
+                <strong></strong>
+                <p></p>
+                <button type="button" class="message-delete" title="Eliminar">🗑️</button>
+            `;
+            li.querySelector('strong').textContent = data.author;
+            li.querySelector('p').textContent = data.text;
+            li.querySelector('.message-delete').addEventListener('click', () => {
+                deleteDoc(doc(db, 'messages', id));
+            });
+            return li;
+        }
+
+        onSnapshot(messagesQuery, (snapshot) => {
+            messagesList.innerHTML = '';
+            snapshot.forEach((docSnap) => {
+                messagesList.appendChild(renderMessage(docSnap.id, docSnap.data()));
+            });
+        });
+
+        messageForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const author = messageAuthor.value.trim();
+            const text = messageText.value.trim();
+            if (!author || !text) return;
+            await addDoc(messagesRef, { author, text, createdAt: serverTimestamp() });
+            messageText.value = '';
         });
     </script>
 </body>
