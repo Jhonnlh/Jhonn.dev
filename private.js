@@ -1,10 +1,47 @@
 // Private Page PIN Management
-const PIN_CORRECT = '2025'; // Cambia esto por tu PIN
+const PIN_HASH = 'b2b2f104d32c638903e151a9b20d6e27b41d8c0c84cf8458738f83ca2f1dd744'; // SHA-256 del PIN 2025 (cámbialo generando tu propio hash)
+const MAX_ATTEMPTS = 3;
+const LOCKOUT_MS = 30000;
+
 const pinInputs = document.querySelectorAll('.pin-input');
 const pinSubmit = document.getElementById('pinSubmit');
 const pinScreen = document.getElementById('pinScreen');
 const privateContent = document.getElementById('privateContent');
 const pinError = document.getElementById('pinError');
+
+async function hashPin(value) {
+  const data = new TextEncoder().encode(value);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function getLockoutUntil() {
+  return Number(sessionStorage.getItem('pinLockoutUntil') || 0);
+}
+
+function getAttempts() {
+  return Number(sessionStorage.getItem('pinAttempts') || 0);
+}
+
+function isLockedOut() {
+  return getLockoutUntil() > Date.now();
+}
+
+function updateLockUI() {
+  const remaining = Math.ceil((getLockoutUntil() - Date.now()) / 1000);
+  if (remaining > 0) {
+    pinInputs.forEach(input => input.disabled = true);
+    pinSubmit.disabled = true;
+    showError(`Demasiados intentos. Espera ${remaining}s`, false);
+    setTimeout(updateLockUI, 1000);
+  } else {
+    pinInputs.forEach(input => input.disabled = false);
+    pinSubmit.disabled = false;
+    sessionStorage.removeItem('pinAttempts');
+    sessionStorage.removeItem('pinLockoutUntil');
+    pinError.classList.remove('show');
+  }
+}
 
 // Auto-move to next input
 pinInputs.forEach((input, index) => {
@@ -26,7 +63,9 @@ pinInputs.forEach((input, index) => {
   });
 });
 
-function verifyPin() {
+async function verifyPin() {
+  if (isLockedOut()) return;
+
   const enteredPin = Array.from(pinInputs).map(input => input.value).join('');
 
   if (enteredPin.length !== 4) {
@@ -34,23 +73,35 @@ function verifyPin() {
     return;
   }
 
-  if (enteredPin === PIN_CORRECT) {
-    localStorage.setItem('privateUnlocked', 'true');
+  const enteredHash = await hashPin(enteredPin);
+
+  if (enteredHash === PIN_HASH) {
+    sessionStorage.removeItem('pinAttempts');
+    sessionStorage.removeItem('pinLockoutUntil');
     pinScreen.style.display = 'none';
     privateContent.classList.add('unlocked');
     pinError.classList.remove('show');
   } else {
-    showError('PIN incorrecto, intenta de nuevo');
-    clearPin();
+    const attempts = getAttempts() + 1;
+    sessionStorage.setItem('pinAttempts', String(attempts));
+
+    if (attempts >= MAX_ATTEMPTS) {
+      sessionStorage.setItem('pinLockoutUntil', String(Date.now() + LOCKOUT_MS));
+      clearPin();
+      updateLockUI();
+    } else {
+      showError(`PIN incorrecto (${attempts}/${MAX_ATTEMPTS})`);
+      clearPin();
+    }
   }
 }
 
-function showError(message) {
+function showError(message, autoHide = true) {
   pinError.textContent = message;
   pinError.classList.add('show');
-  setTimeout(() => {
-    pinError.classList.remove('show');
-  }, 3000);
+  if (autoHide) {
+    setTimeout(() => pinError.classList.remove('show'), 3000);
+  }
 }
 
 function clearPin() {
@@ -60,27 +111,17 @@ function clearPin() {
 
 pinSubmit.addEventListener('click', verifyPin);
 
-// Check if already unlocked
-function checkUnlockedStatus() {
-  if (localStorage.getItem('privateUnlocked') === 'true') {
-    pinScreen.style.display = 'none';
-    privateContent.classList.add('unlocked');
+// La página siempre pide el PIN al abrirse; no se guarda acceso entre visitas
+document.addEventListener('DOMContentLoaded', () => {
+  if (isLockedOut()) {
+    updateLockUI();
   } else {
     pinInputs[0].focus();
   }
-}
 
-// Lock button to clear access
-document.addEventListener('DOMContentLoaded', () => {
-  checkUnlockedStatus();
-
-  // Add lock button to private content
   const lockBtn = document.createElement('button');
   lockBtn.className = 'unlock-button';
-  lockBtn.textContent = '🔓 Logout';
-  lockBtn.onclick = () => {
-    localStorage.removeItem('privateUnlocked');
-    location.reload();
-  };
+  lockBtn.textContent = '🔒 Bloquear';
+  lockBtn.onclick = () => location.reload();
   privateContent.appendChild(lockBtn);
 });

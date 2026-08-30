@@ -150,6 +150,80 @@
         .unlock-button:hover {
             background: var(--card-2);
         }
+
+        .floating-hearts {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .floating-hearts span {
+            position: absolute;
+            bottom: -10%;
+            font-size: 1.4rem;
+            opacity: 0.5;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.4; }
+            100% { transform: translateY(-110vh) rotate(25deg); opacity: 0; }
+        }
+
+        .reasons-list {
+            list-style: none;
+            display: grid;
+            gap: 14px;
+            margin-top: 20px;
+        }
+
+        .reasons-list li {
+            padding: 14px 18px;
+            background: var(--bg-soft);
+            border-radius: 16px;
+            color: var(--text);
+            position: relative;
+            padding-left: 42px;
+        }
+
+        .reasons-list li::before {
+            content: "💗";
+            position: absolute;
+            left: 14px;
+        }
+
+        .countdown-box {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+
+        .countdown-unit {
+            background: var(--bg-soft);
+            border-radius: 18px;
+            padding: 18px 22px;
+            min-width: 90px;
+            text-align: center;
+        }
+
+        .countdown-unit strong {
+            display: block;
+            font-size: 2rem;
+            color: var(--text);
+        }
+
+        .countdown-unit span {
+            font-size: 0.75rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
     </style>
 </head>
 
@@ -175,6 +249,7 @@
 
     <!-- Private Content -->
     <div class="private-content" id="privateContent">
+        <div class="floating-hearts" id="floatingHearts" aria-hidden="true"></div>
         <header class="site-header">
             <div class="container navbar">
                 <a href="index.html" class="brand" aria-label="Inicio">
@@ -254,6 +329,31 @@
                             y recordar por qué eres tan importante en mi vida.
                         </p>
                     </div>
+
+                    <!-- Reasons Why I Love You -->
+                    <div style="margin-top: 40px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px;">
+                        <h2 style="margin-bottom: 8px; text-align: center;">Razones por las que te amo</h2>
+                        <p style="text-align: center; color: var(--muted);">Solo algunas, porque la lista es infinita</p>
+                        <ul class="reasons-list">
+                            <li>Por tu sonrisa, que ilumina hasta mis peores días.</li>
+                            <li>Por cómo me escuchas y me haces sentir en casa.</li>
+                            <li>Por tu paciencia y la forma en que me haces mejor persona.</li>
+                            <li>Por cada pequeño detalle que tienes conmigo sin que lo pida.</li>
+                            <li>Por soñar un futuro juntos y creer en nosotros.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Time Together Countdown -->
+                    <div style="margin-top: 40px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px; text-align: center;">
+                        <h2 style="margin-bottom: 8px;">Nuestro tiempo juntos</h2>
+                        <p style="color: var(--muted); margin-bottom: 8px;">Cada segundo a tu lado cuenta</p>
+                        <div class="countdown-box" id="timeTogether">
+                            <div class="countdown-unit"><strong id="tDays">0</strong><span>Días</span></div>
+                            <div class="countdown-unit"><strong id="tHours">0</strong><span>Horas</span></div>
+                            <div class="countdown-unit"><strong id="tMinutes">0</strong><span>Min</span></div>
+                            <div class="countdown-unit"><strong id="tSeconds">0</strong><span>Seg</span></div>
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>
@@ -270,6 +370,46 @@
 
     <script src="theme.js"></script>
     <script src="private.js"></script>
+    <script>
+        function spawnHearts() {
+            const container = document.getElementById('floatingHearts');
+            const hearts = ['💕', '💖', '💗', '❤️', '💘'];
+            setInterval(() => {
+                const heart = document.createElement('span');
+                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDuration = 6 + Math.random() * 6 + 's';
+                container.appendChild(heart);
+                setTimeout(() => heart.remove(), 12000);
+            }, 900);
+        }
+
+        function startTimeTogether() {
+            const startDate = new Date('2024-01-01T00:00:00'); // Cambia por su fecha de inicio
+            const dayEl = document.getElementById('tDays');
+            const hourEl = document.getElementById('tHours');
+            const minEl = document.getElementById('tMinutes');
+            const secEl = document.getElementById('tSeconds');
+
+            function tick() {
+                const diff = Date.now() - startDate.getTime();
+                if (diff < 0) return;
+                const seconds = Math.floor(diff / 1000);
+                dayEl.textContent = Math.floor(seconds / 86400);
+                hourEl.textContent = Math.floor((seconds % 86400) / 3600);
+                minEl.textContent = Math.floor((seconds % 3600) / 60);
+                secEl.textContent = seconds % 60;
+            }
+
+            tick();
+            setInterval(tick, 1000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            spawnHearts();
+            startTimeTogether();
+        });
+    </script>
 </body>
 
 </html>
