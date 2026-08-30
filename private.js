@@ -8,6 +8,7 @@ const pinSubmit = document.getElementById('pinSubmit');
 const pinScreen = document.getElementById('pinScreen');
 const privateContent = document.getElementById('privateContent');
 const pinError = document.getElementById('pinError');
+const pinAccount = document.getElementById('pinAccount');
 
 async function hashPin(value) {
   const data = new TextEncoder().encode(value);
@@ -114,15 +115,22 @@ pinSubmit.addEventListener('click', verifyPin);
 
 // La página siempre pide el PIN al abrirse; no se guarda acceso entre visitas
 document.addEventListener('DOMContentLoaded', () => {
-  if (isLockedOut()) {
-    updateLockUI();
-  } else {
-    pinInputs[0].focus();
-  }
-
   const lockBtn = document.createElement('button');
   lockBtn.className = 'unlock-button';
   lockBtn.textContent = '🔒 Bloquear';
   lockBtn.onclick = () => location.reload();
   privateContent.appendChild(lockBtn);
+});
+
+// Firebase confirma la cuenta antes de mostrar el PIN de cuatro dígitos.
+document.addEventListener('private:authenticated', (event) => {
+  const name = event.detail?.name || 'visitante';
+  pinAccount.textContent = `Hola, ${name} 💕`;
+  pinAccount.classList.add('visible');
+  pinScreen.classList.remove('auth-pending');
+  if (isLockedOut()) {
+    updateLockUI();
+  } else {
+    clearPin();
+  }
 });

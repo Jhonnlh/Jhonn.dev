@@ -30,6 +30,100 @@
             z-index: 9999;
         }
 
+        .pin-screen.auth-pending {
+            display: none;
+        }
+
+        .auth-screen {
+            position: fixed;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            background: var(--bg);
+            z-index: 10000;
+            padding: 24px;
+        }
+
+        .auth-screen.hidden {
+            display: none;
+        }
+
+        .auth-container {
+            width: min(420px, 100%);
+            text-align: center;
+            padding: 36px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .auth-container h1 {
+            margin-bottom: 8px;
+        }
+
+        .auth-container p {
+            color: var(--muted);
+            margin-bottom: 24px;
+        }
+
+        .auth-form {
+            display: grid;
+            gap: 12px;
+            text-align: left;
+        }
+
+        .auth-form label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .auth-form input,
+        .auth-form select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-soft);
+            color: var(--text);
+            font: inherit;
+        }
+
+        .auth-form button {
+            margin-top: 8px;
+        }
+
+        .auth-error {
+            display: none;
+            color: #ef4444;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        .auth-error.show {
+            display: block;
+        }
+
+        .visitor-greeting {
+            margin: 0 auto 14px;
+            width: fit-content;
+            padding: 8px 14px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: var(--card);
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .logout-button {
+            display: none;
+        }
+
+        .logout-button.visible {
+            display: inline-flex;
+        }
+
         .pin-container {
             width: min(420px, 90%);
             text-align: center;
@@ -56,6 +150,23 @@
             color: var(--muted);
             margin-bottom: 32px;
             font-size: 0.95rem;
+        }
+
+        .pin-container .pin-account {
+            display: none;
+            width: fit-content;
+            margin: 0 auto 22px;
+            padding: 10px 18px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: var(--bg-soft);
+            color: var(--text);
+            font-weight: 700;
+            font-size: 1.15rem;
+        }
+
+        .pin-container .pin-account.visible {
+            display: block;
         }
 
         .pin-input-group {
@@ -486,6 +597,51 @@
             color: var(--muted);
         }
 
+        .playlist-list button {
+            flex-shrink: 0;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--muted);
+        }
+
+        .playlist-list button:hover {
+            color: #ef4444;
+        }
+
+        .playlist-add-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .playlist-add-row input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-soft);
+            color: var(--text);
+            font: inherit;
+        }
+
+        .playlist-add-row button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ef4444, #ec4899);
+            color: #fff;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .private-content .nav-menu {
+            display: none;
+        }
+
         /* Apodos */
         .nickname-grid {
             display: grid;
@@ -640,7 +796,18 @@
             color: white;
         }
 
+        .activity-meta {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 0.75rem;
+        }
+
         .bucket-text {
+            flex: 1;
+        }
+
+        .bucket-copy {
             flex: 1;
         }
 
@@ -831,6 +998,26 @@
             bottom: 24px;
             left: 24px;
             z-index: 100;
+        }
+
+        .music-queue-control {
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            background: var(--card);
+            color: var(--text);
+            font-size: 1rem;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            touch-action: manipulation;
+            transition: var(--transition);
+        }
+
+        .music-queue-control:hover {
+            background: var(--card-2);
+            transform: scale(1.08);
         }
 
         .music-btn-wrap {
@@ -1072,6 +1259,17 @@
             font-size: 0.9rem;
         }
 
+        .online-status {
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .online-status.online {
+            color: #16a34a;
+            font-weight: 700;
+        }
+
         /* Fechas especiales */
         .special-dates-grid {
             display: grid;
@@ -1111,6 +1309,30 @@
             font-size: 0.7rem;
             padding: 3px 8px;
             border-radius: 999px;
+        }
+
+        .gallery-reactions {
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+            display: flex;
+            gap: 4px;
+        }
+
+        .gallery-reaction {
+            border: none;
+            border-radius: 999px;
+            padding: 4px 7px;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: var(--transition);
+        }
+
+        .gallery-reaction:hover {
+            transform: scale(1.1);
+            background: rgba(236, 72, 153, 0.9);
         }
 
         /* Progreso de bucket list */
@@ -1193,13 +1415,148 @@
         .nickname-add-row button:hover {
             transform: translateY(-2px);
         }
+
+        .shared-world {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .shared-card {
+            padding: 24px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+        }
+
+        .shared-card h2 {
+            font-size: 1.2rem;
+            margin-bottom: 6px;
+        }
+
+        .shared-card > p {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .simple-form,
+        .inline-form {
+            display: grid;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .inline-form {
+            grid-template-columns: 1fr;
+        }
+
+        .simple-form input,
+        .simple-form textarea,
+        .inline-form input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg-soft);
+            color: var(--text);
+            font: inherit;
+        }
+
+        .simple-form textarea {
+            min-height: 76px;
+            resize: vertical;
+        }
+
+        .simple-form button,
+        .inline-form button,
+        .signal-button {
+            padding: 10px 14px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #ef4444, #ec4899);
+            color: #fff;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .shared-list,
+        .daily-answers {
+            display: grid;
+            gap: 8px;
+            margin-top: 16px;
+            list-style: none;
+        }
+
+        .shared-list li,
+        .daily-answers > div,
+        .challenge-box {
+            padding: 10px 12px;
+            background: var(--bg-soft);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        .mood-picker {
+            display: flex;
+            justify-content: space-between;
+            gap: 6px;
+            margin-top: 14px;
+        }
+
+        .mood-picker button {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            background: var(--bg-soft);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .signal-button {
+            margin-top: 16px;
+        }
+
+        .signal-result {
+            min-height: 1.2em;
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
     </style>
 </head>
 
 <body>
+    <!-- Acceso por cuenta: Firebase mantiene esta sesión solo en este navegador -->
+    <div class="auth-screen" id="authScreen">
+        <div class="auth-container">
+            <div class="pin-lock-icon">💕</div>
+            <h1>Nuestro mundo privado</h1>
+            <p>Ingresa con tu cuenta para continuar.</p>
+            <form class="auth-form" id="authForm">
+                <label for="authName">¿Quién eres?</label>
+                <select id="authName" required>
+                    <option value="">Selecciona tu nombre</option>
+                    <option value="Jhonn">Jhonn</option>
+                    <option value="Sol">Sol</option>
+                </select>
+                <label for="authEmail">Correo</label>
+                <input id="authEmail" type="email" autocomplete="email" required />
+                <label for="authPassword">Contraseña</label>
+                <input id="authPassword" type="password" autocomplete="current-password" required />
+                <button class="btn btn-primary" type="submit" id="authSubmit">Entrar</button>
+                <p class="auth-error" id="authError"></p>
+            </form>
+        </div>
+    </div>
+
     <!-- PIN Screen -->
-    <div class="pin-screen" id="pinScreen">
+    <div class="pin-screen auth-pending" id="pinScreen">
         <div class="pin-container">
+            <p class="pin-account" id="pinAccount"></p>
             <div class="pin-lock-icon">🔒</div>
             <h1>Contenido Privado</h1>
             <p>Ingresa el PIN para acceder</p>
@@ -1237,6 +1594,7 @@
 
                 <div class="nav-actions">
                     <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema"></button>
+                    <button class="btn btn-secondary logout-button" id="logoutBtn" type="button">Salir</button>
                     <a class="btn btn-secondary" href="index.html">Volver</a>
                 </div>
             </div>
@@ -1248,6 +1606,7 @@
                 <div class="container">
                     <div class="romantic-hero">
                         <div class="romantic-hero-content">
+                            <p class="visitor-greeting" id="visitorGreeting">Bienvenido a nuestro rincón</p>
                             <h1>Jhonn & Sol</h1>
                             <p class="subtitle">Nuestro mundo de amor y momentos especiales</p>
                             <div class="decorative-hearts">💕 💕 💕</div>
@@ -1350,6 +1709,7 @@
                             <div class="countdown-unit"><strong id="tSeconds">0</strong><span>Seg</span></div>
                         </div>
                         <p class="visits-counter" id="visitsCounter"></p>
+                        <p class="online-status" id="onlineStatus"></p>
                     </div>
 
                     <!-- Fechas Especiales -->
@@ -1374,29 +1734,12 @@
                     <div style="margin-top: 40px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px;">
                         <h2 style="text-align: center; margin-bottom: 8px;">Nuestra playlist</h2>
                         <p style="text-align: center; color: var(--muted);">Canciones que nos recuerdan a nosotros</p>
-                        <ul class="playlist-list">
-                            <li>
-                                <span>🎵</span>
-                                <div class="song-info">
-                                    <strong>La canción de nuestra primera cita</strong>
-                                    <span>Agrega aquí el nombre y artista</span>
-                                </div>
-                            </li>
-                            <li>
-                                <span>🎶</span>
-                                <div class="song-info">
-                                    <strong>La que cantamos juntos</strong>
-                                    <span>Agrega aquí el nombre y artista</span>
-                                </div>
-                            </li>
-                            <li>
-                                <span>💿</span>
-                                <div class="song-info">
-                                    <strong>La que me recuerda a ti</strong>
-                                    <span>Agrega aquí el nombre y artista</span>
-                                </div>
-                            </li>
-                        </ul>
+                        <ul class="playlist-list" id="playlistList"></ul>
+                        <form class="playlist-add-row" id="playlistAddForm">
+                            <input id="playlistTitle" type="text" maxlength="80" placeholder="Nombre de la canción y artista" required />
+                            <input id="playlistUrl" type="url" placeholder="Enlace de Spotify" required />
+                            <button type="submit">Agregar canción</button>
+                        </form>
                     </div>
 
                     <!-- Apodos y Bromas Internas -->
@@ -1417,11 +1760,111 @@
                         <p style="text-align: center; color: var(--muted);">Déjense mensajes que quieran leer después</p>
                         <ul class="messages-list" id="messagesList"></ul>
                         <form class="message-form" id="messageForm">
-                            <input type="text" id="messageAuthor" placeholder="Tu nombre" maxlength="20" required />
                             <textarea id="messageText" placeholder="Escribe tu mensaje..." maxlength="300" required></textarea>
                             <button type="submit">Enviar mensaje</button>
                         </form>
                     </div>
+
+                    <section class="shared-world" aria-label="Nuestro mundo compartido">
+                        <div class="shared-card">
+                            <h2>Muro de momentos</h2>
+                            <p>Pequeñas cosas que queremos recordar.</p>
+                            <form class="simple-form" id="momentForm">
+                                <textarea id="momentText" maxlength="300" placeholder="Comparte un momento..."></textarea>
+                                <button type="submit">Publicar</button>
+                            </form>
+                            <ul class="shared-list" id="momentsList"></ul>
+                        </div>
+
+                        <div class="shared-card">
+                            <h2>Planes juntos</h2>
+                            <p>Nuestras próximas citas y aventuras.</p>
+                            <form class="inline-form" id="planForm">
+                                <input id="planText" maxlength="100" placeholder="Nuestro próximo plan" required />
+                                <input id="planDate" type="date" required />
+                                <button type="submit">Guardar</button>
+                            </form>
+                            <ul class="shared-list" id="plansList"></ul>
+                        </div>
+
+                        <div class="shared-card">
+                            <h2>Pregunta de hoy</h2>
+                            <p id="dailyQuestion"></p>
+                            <form class="simple-form" id="dailyAnswerForm">
+                                <textarea id="dailyAnswer" maxlength="250" placeholder="Tu respuesta..."></textarea>
+                                <button type="submit">Responder</button>
+                            </form>
+                            <div class="daily-answers" id="dailyAnswers"></div>
+                        </div>
+
+                        <div class="shared-card compact-card">
+                            <h2>Estado de ánimo</h2>
+                            <p>¿Cómo te sientes hoy?</p>
+                            <div class="mood-picker" id="moodPicker">
+                                <button type="button" data-mood="😊">😊</button>
+                                <button type="button" data-mood="🥰">🥰</button>
+                                <button type="button" data-mood="😔">😔</button>
+                                <button type="button" data-mood="😴">😴</button>
+                                <button type="button" data-mood="😤">😤</button>
+                            </div>
+                            <div class="daily-answers" id="moodsList"></div>
+                        </div>
+
+                        <div class="shared-card compact-card">
+                            <h2>Una señal para ti</h2>
+                            <p>Hazle saber que la tienes presente.</p>
+                            <button class="signal-button" id="thinkOfYouBtn" type="button">💌 Pienso en ti</button>
+                            <p class="signal-result" id="signalResult"></p>
+                        </div>
+
+                        <div class="shared-card">
+                            <h2>Tarro de recuerdos</h2>
+                            <form class="inline-form" id="memoryForm">
+                                <input id="memoryText" maxlength="180" placeholder="Guarda un recuerdo" required />
+                                <button type="submit">Guardar</button>
+                            </form>
+                            <button class="signal-button" id="drawMemoryBtn" type="button">✨ Sacar un recuerdo</button>
+                            <p class="signal-result" id="drawnMemory"></p>
+                        </div>
+
+                        <div class="shared-card">
+                            <h2>Reto semanal</h2>
+                            <form class="inline-form" id="challengeForm">
+                                <input id="challengeText" maxlength="140" placeholder="Propongan un reto para esta semana" required />
+                                <button type="submit">Proponer</button>
+                            </form>
+                            <div class="challenge-box" id="challengeBox"></div>
+                        </div>
+
+                        <div class="shared-card">
+                            <h2>Lugares de nosotros</h2>
+                            <form class="inline-form" id="placeForm">
+                                <input id="placeName" maxlength="70" placeholder="Nombre del lugar" required />
+                                <input id="placeNote" maxlength="120" placeholder="¿Por qué es especial?" required />
+                                <button type="submit">Agregar</button>
+                            </form>
+                            <ul class="shared-list" id="placesList"></ul>
+                        </div>
+
+                        <div class="shared-card">
+                            <h2>Cápsula del tiempo</h2>
+                            <form class="simple-form" id="capsuleForm">
+                                <textarea id="capsuleText" maxlength="300" placeholder="Un mensaje para el futuro..."></textarea>
+                                <input id="capsuleDate" type="date" required />
+                                <button type="submit">Cerrar cápsula</button>
+                            </form>
+                            <ul class="shared-list" id="capsulesList"></ul>
+                        </div>
+
+                        <div class="shared-card">
+                            <h2>Preguntas para nosotros</h2>
+                            <form class="simple-form" id="coupleQuestionForm">
+                                <input id="coupleQuestionText" maxlength="180" placeholder="Escribe una pregunta para ambos" required />
+                                <button type="submit">Agregar pregunta</button>
+                            </form>
+                            <ul class="shared-list" id="coupleQuestionsList"></ul>
+                        </div>
+                    </section>
 
                     <!-- Quiz -->
                     <div style="margin-top: 40px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px;">
@@ -1492,6 +1935,7 @@
         </div>
 
         <div class="music-player" id="musicPlayer">
+            <button class="music-queue-control" id="musicPrevBtn" type="button" aria-label="Canción anterior">⏮</button>
             <div class="music-btn-wrap">
                 <svg class="progress-ring" width="54" height="54">
                     <circle class="progress-ring-bg" cx="27" cy="27" r="24" />
@@ -1500,14 +1944,14 @@
                 <button class="music-player-btn" id="musicPlayBtn">▶</button>
                 <button class="music-list-btn" id="musicListBtn">🎶</button>
             </div>
+            <button class="music-queue-control" id="musicNextBtn" type="button" aria-label="Siguiente canción">⏭</button>
             <div class="music-hint" id="musicHint">Toca aquí para nuestra canción 💕</div>
             <div class="spotify-panel" id="spotifyPanel">
                 <div class="spotify-panel-header">
                     <h3>Nuestra playlist 💕</h3>
                     <button class="spotify-panel-close" id="spotifyClose">✕</button>
                 </div>
-                <button class="playlist-track" data-uri="spotify:track:37miw1ff4zH0LDuFrBvZ4i">🎵 Pero te conocí</button>
-                <button class="playlist-track" data-uri="spotify:track:30brAfx64jxQMeUNUgDFaj">🎵 Sabes</button>
+                <div id="spotifyQueue"></div>
             </div>
             <div id="spotifyEmbedContainer" class="spotify-embed-hidden"></div>
         </div>
@@ -1681,12 +2125,14 @@
         // Música de fondo (Spotify iFrame API: control real de play/pause y progreso)
         function initMusic() {
             const btn = document.getElementById('musicPlayBtn');
+            const prevBtn = document.getElementById('musicPrevBtn');
+            const nextBtn = document.getElementById('musicNextBtn');
             const listBtn = document.getElementById('musicListBtn');
             const closeBtn = document.getElementById('spotifyClose');
             const panel = document.getElementById('spotifyPanel');
             const hint = document.getElementById('musicHint');
             const embedContainer = document.getElementById('spotifyEmbedContainer');
-            const trackButtons = document.querySelectorAll('.playlist-track');
+            const queuePanel = document.getElementById('spotifyQueue');
             const ringFill = document.getElementById('progressRingFill');
 
             const RADIUS = 24;
@@ -1695,6 +2141,12 @@
             ringFill.style.strokeDashoffset = String(CIRCUMFERENCE);
 
             const DEFAULT_URI = 'spotify:track:37miw1ff4zH0LDuFrBvZ4i';
+            let queue = [
+                { title: 'Pero te conocí', uri: DEFAULT_URI },
+                { title: 'Sabes', uri: 'spotify:track:30brAfx64jxQMeUNUgDFaj' }
+            ];
+            let currentIndex = 0;
+            let endHandled = false;
             let controller = null;
             let pendingUri = null;
 
@@ -1713,10 +2165,17 @@
                     updateButtonIcon(e.data.isPaused);
                     const progress = e.data.duration ? e.data.position / e.data.duration : 0;
                     ringFill.style.strokeDashoffset = String(CIRCUMFERENCE * (1 - progress));
+                    if (!e.data.isPaused && e.data.duration && e.data.position >= e.data.duration - 750 && !endHandled) {
+                        endHandled = true;
+                        playQueueItem(currentIndex + 1);
+                    }
                 });
             }
 
             function createOrSwitch(uri) {
+                const index = queue.findIndex((track) => track.uri === uri);
+                if (index >= 0) currentIndex = index;
+                endHandled = false;
                 if (controller) {
                     controller.loadUri(uri);
                     controller.play();
@@ -1728,6 +2187,45 @@
                 }
                 window.__spotifyIframeAPI.createController(embedContainer, { uri, width: '1', height: '1' }, bindController);
             }
+
+            function playQueueItem(index) {
+                if (!queue.length) return;
+                currentIndex = (index + queue.length) % queue.length;
+                createOrSwitch(queue[currentIndex].uri);
+            }
+
+            function renderQueue() {
+                queuePanel.innerHTML = '';
+                queue.forEach((track, index) => {
+                    const trackButton = document.createElement('button');
+                    trackButton.type = 'button';
+                    trackButton.className = 'playlist-track';
+                    trackButton.textContent = `${index === currentIndex ? '▶' : '🎵'} ${track.title}`;
+                    trackButton.addEventListener('click', () => {
+                        playQueueItem(index);
+                        panel.classList.remove('open');
+                    });
+                    queuePanel.appendChild(trackButton);
+                });
+            }
+
+            renderQueue();
+
+            document.addEventListener('playlist:play', (event) => {
+                const uri = event.detail?.uri;
+                if (uri) createOrSwitch(uri);
+            });
+
+            document.addEventListener('playlist:queue', (event) => {
+                const sharedTracks = event.detail?.tracks || [];
+                queue = [
+                    { title: 'Pero te conocí', uri: DEFAULT_URI },
+                    { title: 'Sabes', uri: 'spotify:track:30brAfx64jxQMeUNUgDFaj' },
+                    ...sharedTracks
+                ];
+                currentIndex = Math.min(currentIndex, queue.length - 1);
+                renderQueue();
+            });
 
             // Si el script de Spotify aún no cargó, reintenta cuando esté listo
             const waitForApi = setInterval(() => {
@@ -1751,6 +2249,9 @@
                 panel.classList.toggle('open');
             });
 
+            prevBtn.addEventListener('click', () => playQueueItem(currentIndex - 1));
+            nextBtn.addEventListener('click', () => playQueueItem(currentIndex + 1));
+
             hint.addEventListener('click', () => {
                 hideHint();
                 if (controller) {
@@ -1758,14 +2259,6 @@
                 } else {
                     createOrSwitch(DEFAULT_URI);
                 }
-            });
-
-            trackButtons.forEach((trackBtn) => {
-                trackBtn.addEventListener('click', () => {
-                    hideHint();
-                    createOrSwitch(trackBtn.dataset.uri);
-                    panel.classList.remove('open');
-                });
             });
 
             closeBtn.addEventListener('click', () => panel.classList.remove('open'));
@@ -1836,6 +2329,10 @@
             updateDoc, onSnapshot, query, orderBy, serverTimestamp,
             getDoc, setDoc, increment
         } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import {
+            getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence,
+            signInWithEmailAndPassword, signOut
+        } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAnscQX92Otfn6hY2wmf2uDEq6ehnTZqXY",
@@ -1848,22 +2345,106 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
+        let currentUserName = 'Visitante';
         const bucketRef = collection(db, 'bucketList');
         const bucketQuery = query(bucketRef, orderBy('createdAt', 'asc'));
+
+        const authScreen = document.getElementById('authScreen');
+        const authForm = document.getElementById('authForm');
+        const authName = document.getElementById('authName');
+        const authEmail = document.getElementById('authEmail');
+        const authPassword = document.getElementById('authPassword');
+        const authSubmit = document.getElementById('authSubmit');
+        const authError = document.getElementById('authError');
+        const visitorGreeting = document.getElementById('visitorGreeting');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        function showAuthError(message) {
+            authError.textContent = message;
+            authError.classList.add('show');
+        }
+
+        async function showAuthenticatedUser(user) {
+            const profileRef = doc(db, 'profiles', user.uid);
+            const profile = await getDoc(profileRef);
+            const name = profile.exists()
+                ? profile.data().name
+                : (sessionStorage.getItem('authDisplayName') || user.email.split('@')[0] || 'visitante');
+            sessionStorage.removeItem('authDisplayName');
+            currentUserName = name;
+            visitorGreeting.textContent = `Bienvenido, ${name} 💕`;
+            authScreen.classList.add('hidden');
+            logoutBtn.classList.add('visible');
+            document.dispatchEvent(new CustomEvent('private:authenticated', { detail: { name, uid: user.uid } }));
+        }
+
+        await setPersistence(auth, browserLocalPersistence);
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                showAuthenticatedUser(user).catch(() => showAuthError('No se pudo cargar tu perfil.'));
+            } else {
+                authScreen.classList.remove('hidden');
+                document.getElementById('pinScreen').classList.add('auth-pending');
+                logoutBtn.classList.remove('visible');
+            }
+        });
+
+        authForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const name = authName.value;
+            const email = authEmail.value.trim();
+            const password = authPassword.value;
+            if (!name || !email || !password) return;
+            authError.classList.remove('show');
+            authSubmit.disabled = true;
+            authSubmit.textContent = 'Entrando...';
+            try {
+                sessionStorage.setItem('authDisplayName', name);
+                const credential = await signInWithEmailAndPassword(auth, email, password);
+                await setDoc(doc(db, 'profiles', credential.user.uid), { name }, { merge: true });
+            } catch {
+                sessionStorage.removeItem('authDisplayName');
+                showAuthError('Correo o contraseña incorrectos.');
+            } finally {
+                authSubmit.disabled = false;
+                authSubmit.textContent = 'Entrar';
+            }
+        });
+
+        logoutBtn.addEventListener('click', async () => {
+            await updatePresence(false);
+            await signOut(auth);
+            document.getElementById('pinScreen').style.display = '';
+            document.getElementById('privateContent').classList.remove('unlocked');
+            authPassword.value = '';
+        });
 
         const listEl = document.getElementById('bucketList');
         const form = document.getElementById('bucketAddForm');
         const input = document.getElementById('bucketInput');
+
+        function formatActivity(timestamp, author) {
+            const name = author || 'Alguien especial';
+            const date = timestamp?.toDate
+                ? timestamp.toDate().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
+                : 'ahora';
+            return `Por ${name} · ${date}`;
+        }
 
         function renderItem(id, data) {
             const li = document.createElement('li');
             li.className = data.done ? 'done' : '';
             li.innerHTML = `
                 <span class="bucket-check"></span>
-                <span class="bucket-text"></span>
+                <div class="bucket-copy">
+                    <span class="bucket-text"></span>
+                    <small class="activity-meta"></small>
+                </div>
                 <button type="button" class="bucket-delete" title="Eliminar">🗑️</button>
             `;
             li.querySelector('.bucket-text').textContent = data.text;
+            li.querySelector('.activity-meta').textContent = formatActivity(data.createdAt, data.author);
 
             li.querySelector('.bucket-check').addEventListener('click', () => {
                 updateDoc(doc(db, 'bucketList', id), { done: !data.done });
@@ -1897,7 +2478,13 @@
             e.preventDefault();
             const text = input.value.trim();
             if (!text) return;
-            await addDoc(bucketRef, { text, done: false, createdAt: serverTimestamp() });
+            await addDoc(bucketRef, {
+                text,
+                done: false,
+                author: currentUserName,
+                authorId: auth.currentUser?.uid || '',
+                createdAt: serverTimestamp()
+            });
             input.value = '';
         });
 
@@ -1946,11 +2533,21 @@
             div.innerHTML = `
                 <img src="${data.url}" alt="Foto" />
                 <button type="button" class="gallery-delete" title="Eliminar">🗑️</button>
-                ${dateLabel ? `<span class="gallery-date">${dateLabel}</span>` : ''}
+                <span class="gallery-date">${data.author || 'Foto compartida'}${dateLabel ? ` · ${dateLabel}` : ''}</span>
+                <div class="gallery-reactions">
+                    <button type="button" class="gallery-reaction" data-reaction="likes">👍 ${data.likes || 0}</button>
+                    <button type="button" class="gallery-reaction" data-reaction="loves">❤️ ${data.loves || 0}</button>
+                </div>
             `;
             div.querySelector('.gallery-delete').addEventListener('click', async (e) => {
                 e.stopPropagation();
                 await deleteDoc(doc(db, 'gallery', id));
+            });
+            div.querySelectorAll('.gallery-reaction').forEach((button) => {
+                button.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    await updateDoc(doc(db, 'gallery', id), { [button.dataset.reaction]: increment(1) });
+                });
             });
             return div;
         }
@@ -1971,7 +2568,12 @@
             submitBtn.textContent = 'Subiendo...';
             try {
                 const url = await compressImage(file);
-                await addDoc(galleryRef, { url, createdAt: serverTimestamp() });
+                await addDoc(galleryRef, {
+                    url,
+                    author: currentUserName,
+                    authorId: auth.currentUser?.uid || '',
+                    createdAt: serverTimestamp()
+                });
                 galleryForm.reset();
             } catch {
                 alert('No se pudo subir la foto, intenta con otra imagen.');
@@ -1981,12 +2583,68 @@
             }
         });
 
+        // Playlist compartida: se guardan enlaces de tracks de Spotify.
+        const playlistRef = collection(db, 'playlist');
+        const playlistQuery = query(playlistRef, orderBy('createdAt', 'asc'));
+        const playlistList = document.getElementById('playlistList');
+        const playlistForm = document.getElementById('playlistAddForm');
+        const playlistTitle = document.getElementById('playlistTitle');
+        const playlistUrl = document.getElementById('playlistUrl');
+
+        function spotifyUri(value) {
+            const match = value.trim().match(/(?:spotify:track:|open\.spotify\.com\/(?:intl-[^/]+\/)?track\/)([A-Za-z0-9]+)/);
+            return match ? `spotify:track:${match[1]}` : null;
+        }
+
+        function renderPlaylistItem(id, data) {
+            const item = document.createElement('li');
+            item.innerHTML = `
+                <span>🎵</span>
+                <div class="song-info"><strong></strong><span></span></div>
+                <button type="button" title="Eliminar canción">🗑️</button>
+            `;
+            item.querySelector('strong').textContent = data.title;
+            item.querySelector('.song-info span').textContent = formatActivity(data.createdAt, data.author);
+            item.addEventListener('click', (event) => {
+                if (event.target.closest('button')) return;
+                document.dispatchEvent(new CustomEvent('playlist:play', { detail: { uri: data.uri } }));
+            });
+            item.style.cursor = 'pointer';
+            item.querySelector('button').addEventListener('click', () => deleteDoc(doc(db, 'playlist', id)));
+            return item;
+        }
+
+        onSnapshot(playlistQuery, (snapshot) => {
+            playlistList.innerHTML = '';
+            const tracks = snapshot.docs.map((entry) => entry.data());
+            snapshot.forEach((entry) => playlistList.appendChild(renderPlaylistItem(entry.id, entry.data())));
+            document.dispatchEvent(new CustomEvent('playlist:queue', { detail: { tracks } }));
+        });
+
+        playlistForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const title = playlistTitle.value.trim();
+            const uri = spotifyUri(playlistUrl.value);
+            if (!uri) {
+                playlistUrl.setCustomValidity('Pega un enlace válido de una canción de Spotify.');
+                playlistUrl.reportValidity();
+                return;
+            }
+            playlistUrl.setCustomValidity('');
+            await addDoc(playlistRef, {
+                title,
+                uri,
+                author: currentUserName,
+                createdAt: serverTimestamp()
+            });
+            playlistForm.reset();
+        });
+
         // Notas / mensajes entre ambos
         const messagesRef = collection(db, 'messages');
         const messagesQuery = query(messagesRef, orderBy('createdAt', 'desc'));
         const messagesList = document.getElementById('messagesList');
         const messageForm = document.getElementById('messageForm');
-        const messageAuthor = document.getElementById('messageAuthor');
         const messageText = document.getElementById('messageText');
 
         function renderMessage(id, data) {
@@ -1995,10 +2653,12 @@
             li.innerHTML = `
                 <strong></strong>
                 <p></p>
+                <small class="activity-meta"></small>
                 <button type="button" class="message-delete" title="Eliminar">🗑️</button>
             `;
-            li.querySelector('strong').textContent = data.author;
+            li.querySelector('strong').textContent = data.author || 'Alguien especial';
             li.querySelector('p').textContent = data.text;
+            li.querySelector('.activity-meta').textContent = formatActivity(data.createdAt, data.author);
             li.querySelector('.message-delete').addEventListener('click', () => {
                 deleteDoc(doc(db, 'messages', id));
             });
@@ -2014,10 +2674,14 @@
 
         messageForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const author = messageAuthor.value.trim();
             const text = messageText.value.trim();
-            if (!author || !text) return;
-            await addDoc(messagesRef, { author, text, createdAt: serverTimestamp() });
+            if (!text) return;
+            await addDoc(messagesRef, {
+                author: currentUserName,
+                authorId: auth.currentUser?.uid || '',
+                text,
+                createdAt: serverTimestamp()
+            });
             messageText.value = '';
         });
 
@@ -2093,10 +2757,12 @@ Te amo, Jhonn 🤍`;
             div.innerHTML = `
                 <strong></strong>
                 <span></span>
+                <small class="activity-meta"></small>
                 <button type="button" class="nickname-delete" title="Eliminar">🗑️</button>
             `;
             div.querySelector('strong').textContent = data.title;
             div.querySelector('span').textContent = data.desc;
+            div.querySelector('.activity-meta').textContent = formatActivity(data.createdAt, data.author);
             div.querySelector('.nickname-delete').addEventListener('click', () => deleteDoc(doc(db, 'nicknames', id)));
             return div;
         }
@@ -2119,21 +2785,315 @@ Te amo, Jhonn 🤍`;
             const title = nicknameTitleInput.value.trim();
             const desc = nicknameDescInput.value.trim();
             if (!title || !desc) return;
-            await addDoc(nicknameRef, { title, desc, createdAt: serverTimestamp() });
+            await addDoc(nicknameRef, {
+                title,
+                desc,
+                author: currentUserName,
+                authorId: auth.currentUser?.uid || '',
+                createdAt: serverTimestamp()
+            });
             nicknameForm.reset();
         });
 
-        // Contador de visitas
+        // Espacios compartidos, iniciados después de identificar la cuenta.
+        let sharedWorldReady = false;
+
+        function createListItem(text, meta) {
+            const item = document.createElement('li');
+            const body = document.createElement('div');
+            body.textContent = text;
+            item.appendChild(body);
+            if (meta) {
+                const details = document.createElement('small');
+                details.className = 'activity-meta';
+                details.textContent = meta;
+                item.appendChild(details);
+            }
+            return item;
+        }
+
+        function initSharedWorld() {
+            if (sharedWorldReady) return;
+            sharedWorldReady = true;
+
+            const momentsRef = collection(db, 'moments');
+            const momentsList = document.getElementById('momentsList');
+            document.getElementById('momentForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const input = document.getElementById('momentText');
+                const text = input.value.trim();
+                if (!text) return;
+                await addDoc(momentsRef, { text, author: currentUserName, createdAt: serverTimestamp() });
+                input.value = '';
+            });
+            onSnapshot(query(momentsRef, orderBy('createdAt', 'desc')), (snapshot) => {
+                momentsList.innerHTML = '';
+                snapshot.forEach((entry) => {
+                    const data = entry.data();
+                    momentsList.appendChild(createListItem(data.text, formatActivity(data.createdAt, data.author)));
+                });
+            });
+
+            const plansRef = collection(db, 'plans');
+            const plansList = document.getElementById('plansList');
+            document.getElementById('planForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const text = document.getElementById('planText').value.trim();
+                const date = document.getElementById('planDate').value;
+                if (!text || !date) return;
+                await addDoc(plansRef, { text, date, done: false, author: currentUserName, createdAt: serverTimestamp() });
+                event.target.reset();
+            });
+            onSnapshot(query(plansRef, orderBy('date', 'asc')), (snapshot) => {
+                plansList.innerHTML = '';
+                snapshot.forEach((entry) => {
+                    const data = entry.data();
+                    const item = createListItem(`${data.done ? '✓ ' : ''}${data.date} · ${data.text}`, `Propuesto por ${data.author || 'alguien especial'}`);
+                    item.style.cursor = 'pointer';
+                    item.addEventListener('click', () => updateDoc(doc(db, 'plans', entry.id), { done: !data.done }));
+                    plansList.appendChild(item);
+                });
+            });
+
+            const dayKey = new Date().toISOString().slice(0, 10);
+            const questions = ['¿Qué fue lo más bonito de tu día?', '¿Qué pequeño detalle te hizo sonreír hoy?', '¿Qué plan te gustaría vivir juntos pronto?', '¿Qué agradeces de nosotros hoy?'];
+            const dailyQuestion = questions[new Date().getDate() % questions.length];
+            const dailyDoc = doc(db, 'dailyAnswers', dayKey);
+            document.getElementById('dailyQuestion').textContent = dailyQuestion;
+            document.getElementById('dailyAnswerForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const input = document.getElementById('dailyAnswer');
+                const text = input.value.trim();
+                if (!text) return;
+                await setDoc(dailyDoc, { question: dailyQuestion, answers: { [currentUserName]: text } }, { merge: true });
+                input.value = '';
+            });
+            onSnapshot(dailyDoc, (entry) => {
+                const answers = entry.exists() ? (entry.data().answers || {}) : {};
+                const box = document.getElementById('dailyAnswers');
+                box.innerHTML = '';
+                Object.entries(answers).forEach(([name, text]) => box.appendChild(createListItem(`${name}: ${text}`)));
+            });
+
+            const moodsRef = collection(db, 'moods');
+            document.querySelectorAll('#moodPicker button').forEach((button) => {
+                button.addEventListener('click', () => setDoc(doc(db, 'moods', auth.currentUser.uid), {
+                    name: currentUserName, mood: button.dataset.mood, updatedAt: serverTimestamp()
+                }));
+            });
+            onSnapshot(moodsRef, (snapshot) => {
+                const box = document.getElementById('moodsList');
+                box.innerHTML = '';
+                snapshot.forEach((entry) => {
+                    const data = entry.data();
+                    box.appendChild(createListItem(`${data.name || 'Alguien'} está ${data.mood || '😊'}`));
+                });
+            });
+
+            const signalsDoc = doc(db, 'signals', currentUserName);
+            document.getElementById('thinkOfYouBtn').addEventListener('click', async () => {
+                await setDoc(doc(db, 'signals', otherPerson()), { from: currentUserName, sentAt: serverTimestamp() });
+                document.getElementById('signalResult').textContent = `Le avisaremos a ${otherPerson()} cuando entre 💕`;
+            });
+            onSnapshot(signalsDoc, (entry) => {
+                if (!entry.exists()) return;
+                const data = entry.data();
+                document.getElementById('signalResult').textContent = `${data.from} pensó en ti 💌`;
+            });
+
+            const memoriesRef = collection(db, 'memories');
+            let memories = [];
+            document.getElementById('memoryForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const input = document.getElementById('memoryText');
+                const text = input.value.trim();
+                if (!text) return;
+                await addDoc(memoriesRef, { text, author: currentUserName, createdAt: serverTimestamp() });
+                input.value = '';
+            });
+            onSnapshot(memoriesRef, (snapshot) => {
+                memories = snapshot.docs.map((entry) => entry.data());
+            });
+            document.getElementById('drawMemoryBtn').addEventListener('click', () => {
+                document.getElementById('drawnMemory').textContent = memories.length
+                    ? `“${memories[Math.floor(Math.random() * memories.length)].text}”`
+                    : 'Guarden su primer recuerdo para sacarlo de aquí.';
+            });
+
+            const challengeDoc = doc(db, 'shared', 'weeklyChallenge');
+            document.getElementById('challengeForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const input = document.getElementById('challengeText');
+                const text = input.value.trim();
+                if (!text) return;
+                await setDoc(challengeDoc, { text, author: currentUserName, completedBy: {}, createdAt: serverTimestamp() });
+                input.value = '';
+            });
+            onSnapshot(challengeDoc, (entry) => {
+                const box = document.getElementById('challengeBox');
+                if (!entry.exists()) {
+                    box.textContent = 'Aún no hay reto para esta semana.';
+                    return;
+                }
+                const data = entry.data();
+                box.innerHTML = '';
+                const text = document.createElement('div');
+                text.textContent = data.text;
+                const complete = document.createElement('button');
+                complete.type = 'button';
+                complete.className = 'signal-button';
+                complete.textContent = data.completedBy?.[currentUserName] ? '✓ Lo cumplí' : 'Marcar como cumplido';
+                complete.addEventListener('click', () => setDoc(challengeDoc, { completedBy: { [currentUserName]: true } }, { merge: true }));
+                box.append(text, complete);
+            });
+
+            const placesRef = collection(db, 'places');
+            const placesList = document.getElementById('placesList');
+            document.getElementById('placeForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const name = document.getElementById('placeName').value.trim();
+                const note = document.getElementById('placeNote').value.trim();
+                if (!name || !note) return;
+                await addDoc(placesRef, { name, note, author: currentUserName, createdAt: serverTimestamp() });
+                event.target.reset();
+            });
+            onSnapshot(query(placesRef, orderBy('createdAt', 'desc')), (snapshot) => {
+                placesList.innerHTML = '';
+                snapshot.forEach((entry) => {
+                    const data = entry.data();
+                    placesList.appendChild(createListItem(`${data.name}: ${data.note}`, formatActivity(data.createdAt, data.author)));
+                });
+            });
+
+            const capsulesRef = collection(db, 'capsules');
+            const capsulesList = document.getElementById('capsulesList');
+            document.getElementById('capsuleForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const text = document.getElementById('capsuleText').value.trim();
+                const unlockDate = document.getElementById('capsuleDate').value;
+                if (!text || !unlockDate) return;
+                await addDoc(capsulesRef, { text, unlockDate, author: currentUserName, createdAt: serverTimestamp() });
+                event.target.reset();
+            });
+            onSnapshot(query(capsulesRef, orderBy('unlockDate', 'asc')), (snapshot) => {
+                capsulesList.innerHTML = '';
+                snapshot.forEach((entry) => {
+                    const data = entry.data();
+                    const open = data.unlockDate <= dayKey;
+                    capsulesList.appendChild(createListItem(open ? `💌 ${data.text}` : `🔒 Se abre el ${data.unlockDate}`, `De ${data.author || 'alguien especial'}`));
+                });
+            });
+
+            const coupleQuestionsRef = collection(db, 'coupleQuestions');
+            const coupleQuestionsList = document.getElementById('coupleQuestionsList');
+            document.getElementById('coupleQuestionForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const input = document.getElementById('coupleQuestionText');
+                const text = input.value.trim();
+                if (!text) return;
+                await addDoc(coupleQuestionsRef, { text, author: currentUserName, createdAt: serverTimestamp() });
+                input.value = '';
+            });
+            onSnapshot(query(coupleQuestionsRef, orderBy('createdAt', 'desc')), (snapshot) => {
+                coupleQuestionsList.innerHTML = '';
+                snapshot.forEach((entry) => {
+                    const data = entry.data();
+                    const item = createListItem(data.text, `Pregunta de ${data.author || 'alguien especial'}`);
+                    const answers = data.answers || {};
+                    const answerBox = document.createElement('div');
+                    answerBox.className = 'daily-answers';
+                    const ownAnswer = answers[currentUserName];
+
+                    if (!ownAnswer) {
+                        const form = document.createElement('form');
+                        form.className = 'inline-form';
+                        const input = document.createElement('input');
+                        input.maxLength = 220;
+                        input.placeholder = 'Tu respuesta';
+                        input.required = true;
+                        const button = document.createElement('button');
+                        button.type = 'submit';
+                        button.textContent = 'Responder';
+                        form.append(input, button);
+                        form.addEventListener('submit', async (event) => {
+                            event.preventDefault();
+                            const text = input.value.trim();
+                            if (!text) return;
+                            await setDoc(doc(db, 'coupleQuestions', entry.id), {
+                                answers: { [currentUserName]: text }
+                            }, { merge: true });
+                        });
+                        item.appendChild(form);
+                    }
+
+                    Object.entries(answers).forEach(([name, answer]) => {
+                        answerBox.appendChild(createListItem(`${name}: ${answer}`));
+                    });
+                    item.appendChild(answerBox);
+                    coupleQuestionsList.appendChild(item);
+                });
+            });
+        }
+
+        document.addEventListener('private:authenticated', initSharedWorld);
+
+        // Visitas por persona y presencia reciente
         const visitsDocRef = doc(db, 'stats', 'visits');
         const visitsCounterEl = document.getElementById('visitsCounter');
+        const onlineStatusEl = document.getElementById('onlineStatus');
+        const presenceRef = collection(db, 'presence');
+        let presenceDocRef = null;
+        let presenceHeartbeat = null;
+
+        function otherPerson() {
+            return currentUserName === 'Sol' ? 'Jhonn' : 'Sol';
+        }
+
+        async function updatePresence(isOnline) {
+            if (!presenceDocRef) return;
+            await setDoc(presenceDocRef, {
+                name: currentUserName,
+                online: isOnline,
+                lastActive: serverTimestamp()
+            }, { merge: true });
+        }
 
         onSnapshot(visitsDocRef, (docSnap) => {
-            const count = docSnap.exists() ? (docSnap.data().count || 0) : 0;
-            visitsCounterEl.textContent = `Sol ha entrado ${count} ${count === 1 ? 'vez' : 'veces'} a esta página 💕`;
+            const visits = docSnap.exists() ? (docSnap.data().byUser || {}) : {};
+            const name = otherPerson();
+            const count = visits[name] || 0;
+            visitsCounterEl.textContent = `${name} ha entrado ${count} ${count === 1 ? 'vez' : 'veces'} a esta página 💕`;
+        });
+
+        onSnapshot(presenceRef, (snapshot) => {
+            const other = otherPerson();
+            const otherPresence = snapshot.docs.find((entry) => entry.data().name === other)?.data();
+            const lastActive = otherPresence?.lastActive?.toDate?.() || null;
+            const recentlyActive = lastActive && (Date.now() - lastActive.getTime() < 90000);
+            const isOnline = otherPresence?.online && recentlyActive;
+            onlineStatusEl.textContent = isOnline ? `● ${other} está en línea` : `${other} no está en línea`;
+            onlineStatusEl.classList.toggle('online', Boolean(isOnline));
         });
 
         document.addEventListener('private:unlocked', () => {
-            setDoc(visitsDocRef, { count: increment(1), lastVisit: serverTimestamp() }, { merge: true });
+            const userId = auth.currentUser?.uid;
+            if (!userId) return;
+            presenceDocRef = doc(db, 'presence', userId);
+            updatePresence(true);
+            if (!presenceHeartbeat) {
+                presenceHeartbeat = setInterval(() => updatePresence(true), 30000);
+            }
+            setDoc(visitsDocRef, {
+                byUser: { [currentUserName]: increment(1) },
+                lastVisit: serverTimestamp()
+            }, { merge: true });
+        });
+
+        window.addEventListener('pagehide', () => {
+            if (presenceHeartbeat) clearInterval(presenceHeartbeat);
+            if (presenceDocRef) {
+                setDoc(presenceDocRef, { online: false, lastActive: serverTimestamp() }, { merge: true });
+            }
         });
     </script>
 </body>
