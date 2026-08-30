@@ -534,6 +534,298 @@
         .music-toggle:hover {
             background: var(--card-2);
         }
+
+        /* Hero Romántico */
+        .romantic-hero {
+            text-align: center;
+            padding: 80px 20px;
+            background: linear-gradient(135deg, var(--bg-soft), var(--card-2));
+            border-radius: 32px;
+            margin-bottom: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .romantic-hero::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.1) 0%, transparent 70%);
+            animation: glow 6s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .romantic-hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .romantic-hero h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #ef4444, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .romantic-hero .subtitle {
+            font-size: 1.3rem;
+            color: var(--muted);
+            margin-top: 16px;
+            font-style: italic;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .romantic-hero .decorative-hearts {
+            font-size: 2rem;
+            margin-top: 20px;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            50% { transform: scale(1); }
+            75% { transform: scale(1.1); }
+        }
+
+        /* Música de Fondo */
+        .music-player {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Música de Fondo - Spotify */
+        .music-player {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            z-index: 100;
+        }
+
+        .music-btn-wrap {
+            position: relative;
+            width: 54px;
+            height: 54px;
+        }
+
+        .progress-ring {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform: rotate(-90deg);
+            pointer-events: none;
+        }
+
+        .progress-ring-bg {
+            fill: none;
+            stroke: var(--border);
+            stroke-width: 3;
+        }
+
+        .progress-ring-fill {
+            fill: none;
+            stroke: url(#ringGradient);
+            stroke: #ec4899;
+            stroke-width: 3;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.25s linear;
+        }
+
+        .music-player-btn {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ef4444, #ec4899);
+            border: none;
+            color: #fff;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: var(--transition);
+            box-shadow: 0 10px 30px rgba(236, 72, 153, 0.35);
+        }
+
+        .music-player-btn:hover {
+            transform: scale(1.08);
+        }
+
+        .music-list-btn {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--card);
+            border: 1px solid var(--border);
+            font-size: 0.75rem;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: var(--transition);
+        }
+
+        .music-list-btn:hover {
+            transform: scale(1.15);
+        }
+
+        .spotify-embed-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .spotify-panel {
+            position: absolute;
+            bottom: 66px;
+            left: 0;
+            width: 240px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        .spotify-panel.open {
+            display: flex;
+        }
+
+        .spotify-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 4px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4px;
+        }
+
+        .spotify-panel-header h3 {
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .spotify-panel-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--muted);
+            transition: var(--transition);
+        }
+
+        .spotify-panel-close:hover {
+            color: var(--text);
+            transform: rotate(90deg);
+        }
+
+        .playlist-track {
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 14px;
+            text-align: left;
+            cursor: pointer;
+            color: var(--text);
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+
+        .playlist-track:hover {
+            background: var(--card-2);
+            transform: translateX(4px);
+        }
+
+        .music-hint {
+            position: absolute;
+            bottom: 66px;
+            left: 0;
+            width: max-content;
+            max-width: 220px;
+            background: var(--text);
+            color: var(--bg);
+            font-size: 0.8rem;
+            padding: 10px 14px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            animation: bounceHint 1.6s ease-in-out infinite;
+            cursor: pointer;
+            display: none;
+        }
+
+        .music-hint.show {
+            display: block;
+        }
+
+        .music-hint::after {
+            content: "";
+            position: absolute;
+            bottom: -6px;
+            left: 20px;
+            width: 12px;
+            height: 12px;
+            background: var(--text);
+            transform: rotate(45deg);
+        }
+
+        @keyframes bounceHint {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
     </style>
 </head>
 
@@ -584,6 +876,19 @@
         </header>
 
         <main>
+            <!-- Encabezado Romántico -->
+            <section class="section" style="padding-top: 40px;">
+                <div class="container">
+                    <div class="romantic-hero">
+                        <div class="romantic-hero-content">
+                            <h1>Jhonn & Sol</h1>
+                            <p class="subtitle">Nuestro mundo de amor y momentos especiales</p>
+                            <div class="decorative-hearts">💕 💕 💕</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <section class="section" id="private">
                 <div class="container">
                     <div class="section-heading">
@@ -820,12 +1125,35 @@
             <div class="lightbox-box" id="lightboxBox">📸</div>
         </div>
 
-        <button class="music-toggle" id="musicToggle">🎵 Música</button>
+        <div class="music-player" id="musicPlayer">
+            <div class="music-btn-wrap">
+                <svg class="progress-ring" width="54" height="54">
+                    <circle class="progress-ring-bg" cx="27" cy="27" r="24" />
+                    <circle class="progress-ring-fill" id="progressRingFill" cx="27" cy="27" r="24" />
+                </svg>
+                <button class="music-player-btn" id="musicPlayBtn">▶</button>
+                <button class="music-list-btn" id="musicListBtn">🎶</button>
+            </div>
+            <div class="music-hint" id="musicHint">Toca aquí para nuestra canción 💕</div>
+            <div class="spotify-panel" id="spotifyPanel">
+                <div class="spotify-panel-header">
+                    <h3>Nuestra playlist 💕</h3>
+                    <button class="spotify-panel-close" id="spotifyClose">✕</button>
+                </div>
+                <button class="playlist-track" data-uri="spotify:track:37miw1ff4zH0LDuFrBvZ4i">🎵 Pero te conocí</button>
+                <button class="playlist-track" data-uri="spotify:track:30brAfx64jxQMeUNUgDFaj">🎵 Sabes</button>
+            </div>
+            <div id="spotifyEmbedContainer" class="spotify-embed-hidden"></div>
+        </div>
         <canvas id="confettiCanvas"></canvas>
     </div>
 
     <script src="theme.js"></script>
     <script src="private.js"></script>
+    <script>
+        window.onSpotifyIframeApiReady = (IFrameAPI) => { window.__spotifyIframeAPI = IFrameAPI; };
+    </script>
+    <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
     <script>
         function spawnHearts() {
             const container = document.getElementById('floatingHearts');
@@ -994,22 +1322,110 @@
             animate();
         }
 
-        // Música de fondo (agrega tu propio archivo de audio en /audio/musica.mp3)
+        // Música de fondo (Spotify iFrame API: control real de play/pause y progreso)
         function initMusic() {
-            const audio = new Audio('audio/musica.mp3');
-            audio.loop = true;
-            const btn = document.getElementById('musicToggle');
-            let playing = false;
+            const btn = document.getElementById('musicPlayBtn');
+            const listBtn = document.getElementById('musicListBtn');
+            const closeBtn = document.getElementById('spotifyClose');
+            const panel = document.getElementById('spotifyPanel');
+            const hint = document.getElementById('musicHint');
+            const embedContainer = document.getElementById('spotifyEmbedContainer');
+            const trackButtons = document.querySelectorAll('.playlist-track');
+            const ringFill = document.getElementById('progressRingFill');
+
+            const RADIUS = 24;
+            const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+            ringFill.style.strokeDasharray = String(CIRCUMFERENCE);
+            ringFill.style.strokeDashoffset = String(CIRCUMFERENCE);
+
+            const DEFAULT_URI = 'spotify:track:37miw1ff4zH0LDuFrBvZ4i';
+            let controller = null;
+            let pendingUri = null;
+
+            function hideHint() {
+                hint.classList.remove('show');
+            }
+
+            function updateButtonIcon(isPaused) {
+                btn.textContent = isPaused ? '▶' : '⏸';
+            }
+
+            function bindController(c) {
+                controller = c;
+                controller.addListener('ready', () => controller.play());
+                controller.addListener('playback_update', (e) => {
+                    updateButtonIcon(e.data.isPaused);
+                    const progress = e.data.duration ? e.data.position / e.data.duration : 0;
+                    ringFill.style.strokeDashoffset = String(CIRCUMFERENCE * (1 - progress));
+                });
+            }
+
+            function createOrSwitch(uri) {
+                if (controller) {
+                    controller.loadUri(uri);
+                    controller.play();
+                    return;
+                }
+                if (!window.__spotifyIframeAPI) {
+                    pendingUri = uri;
+                    return;
+                }
+                window.__spotifyIframeAPI.createController(embedContainer, { uri, width: '1', height: '1' }, bindController);
+            }
+
+            // Si el script de Spotify aún no cargó, reintenta cuando esté listo
+            const waitForApi = setInterval(() => {
+                if (window.__spotifyIframeAPI && pendingUri) {
+                    clearInterval(waitForApi);
+                    createOrSwitch(pendingUri);
+                }
+            }, 300);
 
             btn.addEventListener('click', () => {
-                if (playing) {
-                    audio.pause();
-                    btn.textContent = '🎵 Música';
+                hideHint();
+                if (controller) {
+                    controller.togglePlay();
                 } else {
-                    audio.play().catch(() => {});
-                    btn.textContent = '⏸ Pausar';
+                    createOrSwitch(DEFAULT_URI);
                 }
-                playing = !playing;
+            });
+
+            listBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                panel.classList.toggle('open');
+            });
+
+            hint.addEventListener('click', () => {
+                hideHint();
+                if (controller) {
+                    controller.play();
+                } else {
+                    createOrSwitch(DEFAULT_URI);
+                }
+            });
+
+            trackButtons.forEach((trackBtn) => {
+                trackBtn.addEventListener('click', () => {
+                    hideHint();
+                    createOrSwitch(trackBtn.dataset.uri);
+                    panel.classList.remove('open');
+                });
+            });
+
+            closeBtn.addEventListener('click', () => panel.classList.remove('open'));
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#musicPlayer')) {
+                    panel.classList.remove('open');
+                }
+            });
+
+            // Al desbloquear con el PIN, se intenta sonar automáticamente
+            // y se muestra un aviso por si el navegador bloquea el autoplay
+            document.addEventListener('private:unlocked', () => {
+                createOrSwitch(DEFAULT_URI);
+                hint.classList.add('show');
+                setTimeout(hideHint, 6000);
             });
         }
 

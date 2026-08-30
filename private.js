@@ -81,6 +81,7 @@ async function verifyPin() {
     pinScreen.style.display = 'none';
     privateContent.classList.add('unlocked');
     pinError.classList.remove('show');
+    document.dispatchEvent(new Event('private:unlocked'));
   } else {
     const attempts = getAttempts() + 1;
     sessionStorage.setItem('pinAttempts', String(attempts));
