@@ -1,5 +1,5 @@
 // Private Page PIN Management
-const PIN_HASH = 'b2b2f104d32c638903e151a9b20d6e27b41d8c0c84cf8458738f83ca2f1dd744'; // SHA-256 del PIN 2025 (cámbialo generando tu propio hash)
+const PIN_HASH = '0e1a3aec7fd93fa52fea73290fec50e6cf62fb1fa6d03b9ebc0a0a3272232339'; // SHA-256 del PIN 2530 (cámbialo generando tu propio hash)
 const MAX_ATTEMPTS = 3;
 const LOCKOUT_MS = 30000;
 
