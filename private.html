@@ -224,6 +224,316 @@
             text-transform: uppercase;
             letter-spacing: 0.08em;
         }
+
+        /* Sobre / carta sellada */
+        .envelope {
+            max-width: 340px;
+            margin: 0 auto;
+            cursor: pointer;
+            perspective: 1200px;
+        }
+
+        .envelope-body {
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 48px 24px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .envelope-body:hover {
+            transform: translateY(-4px);
+        }
+
+        .envelope-icon {
+            font-size: 3rem;
+        }
+
+        .envelope-hint {
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .letter-content {
+            display: none;
+            margin-top: 24px;
+            text-align: left;
+            line-height: 1.9;
+            color: var(--text);
+        }
+
+        .letter-content.open {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Galería */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .gallery-item {
+            aspect-ratio: 1;
+            border-radius: 18px;
+            display: grid;
+            place-items: center;
+            font-size: 2rem;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: linear-gradient(135deg, var(--bg-soft), var(--card-2));
+            transition: var(--transition);
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.04);
+        }
+
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            display: none;
+            place-items: center;
+            z-index: 500;
+        }
+
+        .lightbox.open {
+            display: grid;
+        }
+
+        .lightbox-box {
+            width: min(360px, 85%);
+            aspect-ratio: 1;
+            border-radius: 20px;
+            background: var(--card);
+            display: grid;
+            place-items: center;
+            font-size: 4rem;
+        }
+
+        /* Playlist */
+        .playlist-list {
+            list-style: none;
+            display: grid;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .playlist-list li {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            background: var(--bg-soft);
+            border-radius: 16px;
+        }
+
+        .playlist-list .song-info strong {
+            display: block;
+            color: var(--text);
+        }
+
+        .playlist-list .song-info span {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        /* Apodos */
+        .nickname-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .nickname-card {
+            background: var(--bg-soft);
+            border-radius: 16px;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .nickname-card strong {
+            display: block;
+            font-size: 1.1rem;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .nickname-card span {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        /* Quiz */
+        .quiz-question {
+            margin-top: 20px;
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .quiz-option {
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: var(--bg-soft);
+            color: var(--text);
+            cursor: pointer;
+            text-align: left;
+            transition: var(--transition);
+        }
+
+        .quiz-option:hover {
+            background: var(--card-2);
+        }
+
+        .quiz-option.correct {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.12);
+        }
+
+        .quiz-option.wrong {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.12);
+        }
+
+        .quiz-result {
+            margin-top: 16px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .quiz-result.show {
+            display: block;
+        }
+
+        /* Ruleta */
+        .wheel-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .wheel {
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            position: relative;
+            background: conic-gradient(
+                #f8b4c0 0deg 60deg,
+                #f5d6b0 60deg 120deg,
+                #b6e3d4 120deg 180deg,
+                #b8d3f5 180deg 240deg,
+                #d9c2f0 240deg 300deg,
+                #f5e8a8 300deg 360deg
+            );
+            border: 4px solid var(--card);
+            box-shadow: var(--shadow);
+            transition: transform 4s cubic-bezier(0.2, 0.9, 0.2, 1);
+        }
+
+        .wheel-pointer {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.6rem;
+        }
+
+        .wheel-result {
+            font-weight: 700;
+            font-size: 1.1rem;
+            min-height: 1.6em;
+            text-align: center;
+        }
+
+        /* Bucket list */
+        .bucket-list {
+            list-style: none;
+            display: grid;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .bucket-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-soft);
+            border-radius: 14px;
+            cursor: pointer;
+        }
+
+        .bucket-list li.done span {
+            text-decoration: line-through;
+            color: var(--muted);
+        }
+
+        .bucket-check {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+        }
+
+        .bucket-list li.done .bucket-check {
+            background: #22c55e;
+            border-color: #22c55e;
+            color: white;
+        }
+
+        /* Botón sorpresa */
+        .surprise-btn {
+            display: block;
+            margin: 24px auto 0;
+        }
+
+        #confettiCanvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 600;
+        }
+
+        /* Música */
+        .music-toggle {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            padding: 12px 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            color: var(--muted);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 100;
+        }
+
+        .music-toggle:hover {
+            background: var(--card-2);
+        }
     </style>
 </head>
 
@@ -278,7 +588,7 @@
                 <div class="container">
                     <div class="section-heading">
                         <div>
-                            <span class="eyebrow">Mi Espacio Privado</span>
+                            <span class="eyebrow">Para ti, Sol</span>
                             <h2>Un rincón especial para momentos inolvidables.</h2>
                         </div>
                     </div>
@@ -320,14 +630,37 @@
                         </div>
                     </div>
 
-                    <!-- Special Message Section -->
-                    <div style="margin-top: 64px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px; text-align: center;">
-                        <h2 style="margin-bottom: 16px;">Te Quiero</h2>
-                        <p style="font-size: 1.1rem; color: var(--muted); line-height: 1.8;">
-                            En este espacio privado, quería tener un lugar solo para nosotros.
-                            Un lugar donde expresar lo que siento, guardar nuestros momentos,
-                            y recordar por qué eres tan importante en mi vida.
-                        </p>
+                    <!-- Carta Sellada -->
+                    <div style="margin-top: 64px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px;">
+                        <div class="envelope" id="envelope">
+                            <div class="envelope-body" id="envelopeBody">
+                                <div class="envelope-icon">💌</div>
+                                <h2 style="margin-top: 12px;">Una carta para ti, Sol</h2>
+                                <p class="envelope-hint">Toca el sobre para abrirlo</p>
+                            </div>
+                            <div class="letter-content" id="letterContent">
+                                <p>Sol, mi amor:</p>
+                                <br>
+                                <p>
+                                    Desde el 5 de agosto no ha pasado un solo día en el que no piense en ti.
+                                    Todavía recuerdo cómo empezó todo, esa sensación de que algo especial
+                                    estaba por comenzar, y no me equivoqué.
+                                </p>
+                                <br>
+                                <p>
+                                    Eres esa persona que llegó a poner orden en mi caos, que me hace reír
+                                    cuando menos lo espero y que me da paz con solo estar cerca. Contigo
+                                    todo se siente más simple, más bonito, más nuestro.
+                                </p>
+                                <br>
+                                <p>
+                                    Quiero seguir construyendo historia contigo, quiero más días 5 de agosto,
+                                    más risas, más planes, más nosotros. Gracias por elegirme cada día.
+                                </p>
+                                <br>
+                                <p>Te amo, Jhonn 🤍</p>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Reasons Why I Love You -->
@@ -354,6 +687,122 @@
                             <div class="countdown-unit"><strong id="tSeconds">0</strong><span>Seg</span></div>
                         </div>
                     </div>
+
+                    <!-- Galería de Momentos -->
+                    <div style="margin-top: 40px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px;">
+                        <h2 style="text-align: center; margin-bottom: 8px;">Galería de momentos</h2>
+                        <p style="text-align: center; color: var(--muted);">Un espacio para nuestras fotos favoritas</p>
+                        <div class="gallery-grid" id="galleryGrid">
+                            <div class="gallery-item" data-photo="📸">📸</div>
+                            <div class="gallery-item" data-photo="🌅">🌅</div>
+                            <div class="gallery-item" data-photo="🎡">🎡</div>
+                            <div class="gallery-item" data-photo="🍕">🍕</div>
+                            <div class="gallery-item" data-photo="🎬">🎬</div>
+                            <div class="gallery-item" data-photo="🌙">🌙</div>
+                        </div>
+                        <p style="text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 16px;">
+                            Reemplaza estos espacios por sus fotos reales cuando quieras.
+                        </p>
+                    </div>
+
+                    <!-- Nuestra Playlist -->
+                    <div style="margin-top: 40px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px;">
+                        <h2 style="text-align: center; margin-bottom: 8px;">Nuestra playlist</h2>
+                        <p style="text-align: center; color: var(--muted);">Canciones que nos recuerdan a nosotros</p>
+                        <ul class="playlist-list">
+                            <li>
+                                <span>🎵</span>
+                                <div class="song-info">
+                                    <strong>La canción de nuestra primera cita</strong>
+                                    <span>Agrega aquí el nombre y artista</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span>🎶</span>
+                                <div class="song-info">
+                                    <strong>La que cantamos juntos</strong>
+                                    <span>Agrega aquí el nombre y artista</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span>💿</span>
+                                <div class="song-info">
+                                    <strong>La que me recuerda a ti</strong>
+                                    <span>Agrega aquí el nombre y artista</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Apodos y Bromas Internas -->
+                    <div style="margin-top: 40px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px;">
+                        <h2 style="text-align: center; margin-bottom: 8px;">Solo cosas de nosotros</h2>
+                        <p style="text-align: center; color: var(--muted);">Apodos y bromas internas de Jhonn y Sol</p>
+                        <div class="nickname-grid">
+                            <div class="nickname-card">
+                                <strong>Sol ☀️</strong>
+                                <span>Porque iluminas hasta mis peores días</span>
+                            </div>
+                            <div class="nickname-card">
+                                <strong>Nuestra frase</strong>
+                                <span>Agrega aquí esa frase que solo ustedes entienden</span>
+                            </div>
+                            <div class="nickname-card">
+                                <strong>Ese chiste interno</strong>
+                                <span>Agrega aquí esa anécdota que siempre los hace reír</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quiz -->
+                    <div style="margin-top: 40px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px;">
+                        <h2 style="text-align: center; margin-bottom: 8px;">¿Qué tanto me conoces?</h2>
+                        <p style="text-align: center; color: var(--muted);">Un juego rápido para ti, Sol</p>
+                        <div class="quiz-question">
+                            <p style="font-weight: 600;">¿Qué es lo que más me gusta de estar contigo?</p>
+                            <div class="quiz-options" id="quizOptions">
+                                <div class="quiz-option" data-correct="false">Ver películas juntos</div>
+                                <div class="quiz-option" data-correct="true">Sentir que puedo ser yo mismo</div>
+                                <div class="quiz-option" data-correct="false">Que me cocines algo rico</div>
+                            </div>
+                            <p class="quiz-result" id="quizResult"></p>
+                        </div>
+                    </div>
+
+                    <!-- Ruleta de Citas -->
+                    <div style="margin-top: 40px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px;">
+                        <h2 style="text-align: center; margin-bottom: 8px;">Ruleta de citas</h2>
+                        <p style="text-align: center; color: var(--muted);">Gira y descubre nuestro próximo plan</p>
+                        <div class="wheel-wrap">
+                            <div style="position: relative;">
+                                <div class="wheel-pointer">📍</div>
+                                <div class="wheel" id="dateWheel"></div>
+                            </div>
+                            <button class="btn btn-primary" id="spinWheel">Girar la ruleta</button>
+                            <p class="wheel-result" id="wheelResult"></p>
+                        </div>
+                    </div>
+
+                    <!-- Bucket List -->
+                    <div style="margin-top: 40px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px;">
+                        <h2 style="text-align: center; margin-bottom: 8px;">Nuestra bucket list</h2>
+                        <p style="text-align: center; color: var(--muted);">Cosas que quiero hacer contigo, Sol</p>
+                        <ul class="bucket-list" id="bucketList">
+                            <li data-id="1"><span class="bucket-check"></span><span>Hacer un viaje juntos</span></li>
+                            <li data-id="2"><span class="bucket-check"></span><span>Cocinar una cena especial en casa</span></li>
+                            <li data-id="3"><span class="bucket-check"></span><span>Ver un atardecer completo juntos</span></li>
+                            <li data-id="4"><span class="bucket-check"></span><span>Conocer un lugar nuevo los dos</span></li>
+                            <li data-id="5"><span class="bucket-check"></span><span>Tener una noche de películas sin celular</span></li>
+                        </ul>
+                    </div>
+
+                    <!-- Botón Sorpresa -->
+                    <div style="margin-top: 40px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px; text-align: center;">
+                        <h2 style="margin-bottom: 8px;">Un último detalle</h2>
+                        <p style="color: var(--muted);">Presiona el botón, es para ti</p>
+                        <button class="btn btn-primary surprise-btn" id="surpriseBtn">💝 Sorpréndeme</button>
+                        <p class="wheel-result" id="surpriseMessage" style="margin-top: 16px;"></p>
+                    </div>
                 </div>
             </section>
         </main>
@@ -366,6 +815,13 @@
                 </div>
             </div>
         </footer>
+
+        <div class="lightbox" id="lightbox">
+            <div class="lightbox-box" id="lightboxBox">📸</div>
+        </div>
+
+        <button class="music-toggle" id="musicToggle">🎵 Música</button>
+        <canvas id="confettiCanvas"></canvas>
     </div>
 
     <script src="theme.js"></script>
@@ -405,9 +861,168 @@
             setInterval(tick, 1000);
         }
 
+        // Sobre / carta sellada
+        function initEnvelope() {
+            const envelopeBody = document.getElementById('envelopeBody');
+            const letterContent = document.getElementById('letterContent');
+            envelopeBody.addEventListener('click', () => {
+                letterContent.classList.toggle('open');
+                envelopeBody.style.display = letterContent.classList.contains('open') ? 'none' : 'block';
+            });
+        }
+
+        // Galería con lightbox
+        function initGallery() {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxBox = document.getElementById('lightboxBox');
+            document.getElementById('galleryGrid').addEventListener('click', (e) => {
+                const item = e.target.closest('.gallery-item');
+                if (!item) return;
+                lightboxBox.textContent = item.dataset.photo;
+                lightbox.classList.add('open');
+            });
+            lightbox.addEventListener('click', () => lightbox.classList.remove('open'));
+        }
+
+        // Quiz
+        function initQuiz() {
+            const options = document.querySelectorAll('#quizOptions .quiz-option');
+            const result = document.getElementById('quizResult');
+            options.forEach(option => {
+                option.addEventListener('click', () => {
+                    if (option.classList.contains('correct') || option.classList.contains('wrong')) return;
+                    const isCorrect = option.dataset.correct === 'true';
+                    option.classList.add(isCorrect ? 'correct' : 'wrong');
+                    result.textContent = isCorrect
+                        ? '¡Exacto, Sol! Me conoces perfecto 💗'
+                        : 'Casi, pero lo que más amo es sentir que puedo ser yo mismo contigo 💗';
+                    result.classList.add('show');
+                    options.forEach(o => o.style.pointerEvents = 'none');
+                });
+            });
+        }
+
+        // Ruleta de citas
+        function initWheel() {
+            const dates = [
+                'Noche de películas en casa',
+                'Cena romántica sorpresa',
+                'Paseo al atardecer',
+                'Día de spa en casa',
+                'Ruta gastronómica juntos',
+                'Picnic al aire libre'
+            ];
+            const wheel = document.getElementById('dateWheel');
+            const resultEl = document.getElementById('wheelResult');
+            let currentRotation = 0;
+
+            document.getElementById('spinWheel').addEventListener('click', () => {
+                const sliceIndex = Math.floor(Math.random() * dates.length);
+                const sliceAngle = 360 / dates.length;
+                const targetAngle = 360 * 4 + (360 - (sliceIndex * sliceAngle) - sliceAngle / 2);
+                currentRotation += targetAngle;
+                wheel.style.transform = `rotate(${currentRotation}deg)`;
+                resultEl.textContent = '';
+                setTimeout(() => {
+                    resultEl.textContent = `💌 ${dates[sliceIndex]}`;
+                }, 4000);
+            });
+        }
+
+        // Bucket list persistente
+        function initBucketList() {
+            const items = document.querySelectorAll('#bucketList li');
+            items.forEach(item => {
+                const id = 'bucket_' + item.dataset.id;
+                if (localStorage.getItem(id) === 'done') {
+                    item.classList.add('done');
+                }
+                item.addEventListener('click', () => {
+                    item.classList.toggle('done');
+                    localStorage.setItem(id, item.classList.contains('done') ? 'done' : 'pending');
+                });
+            });
+        }
+
+        // Botón sorpresa con confeti
+        function initSurprise() {
+            const messages = [
+                'Eres lo mejor que me ha pasado, Sol 💗',
+                'Gracias por existir y elegirme cada día 🤍',
+                'Contigo todo tiene más sentido ✨',
+                'Eres mi persona favorita, sin duda 💕'
+            ];
+            const canvas = document.getElementById('confettiCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            document.getElementById('surpriseBtn').addEventListener('click', () => {
+                document.getElementById('surpriseMessage').textContent =
+                    messages[Math.floor(Math.random() * messages.length)];
+                launchConfetti(ctx, canvas);
+            });
+        }
+
+        function launchConfetti(ctx, canvas) {
+            const colors = ['#f8b4c0', '#f5d6b0', '#b6e3d4', '#b8d3f5', '#d9c2f0'];
+            const particles = Array.from({ length: 120 }, () => ({
+                x: Math.random() * canvas.width,
+                y: -20,
+                size: 4 + Math.random() * 6,
+                speed: 2 + Math.random() * 3,
+                drift: (Math.random() - 0.5) * 2,
+                color: colors[Math.floor(Math.random() * colors.length)]
+            }));
+
+            let frame = 0;
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.y += p.speed;
+                    p.x += p.drift;
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(p.x, p.y, p.size, p.size);
+                });
+                frame++;
+                if (frame < 150) {
+                    requestAnimationFrame(animate);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+            animate();
+        }
+
+        // Música de fondo (agrega tu propio archivo de audio en /audio/musica.mp3)
+        function initMusic() {
+            const audio = new Audio('audio/musica.mp3');
+            audio.loop = true;
+            const btn = document.getElementById('musicToggle');
+            let playing = false;
+
+            btn.addEventListener('click', () => {
+                if (playing) {
+                    audio.pause();
+                    btn.textContent = '🎵 Música';
+                } else {
+                    audio.play().catch(() => {});
+                    btn.textContent = '⏸ Pausar';
+                }
+                playing = !playing;
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             spawnHearts();
             startTimeTogether();
+            initEnvelope();
+            initGallery();
+            initQuiz();
+            initWheel();
+            initBucketList();
+            initSurprise();
+            initMusic();
         });
     </script>
 </body>
