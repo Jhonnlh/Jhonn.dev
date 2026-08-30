@@ -1,0 +1,24 @@
+{
+  "name": "Jhonn y Sol",
+  "short_name": "Jhonn y Sol",
+  "description": "Nuestro mundo de amor y momentos especiales.",
+  "start_url": "./private.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fff7f8",
+  "theme_color": "#ec4899",
+  "icons": [
+    {
+      "src": "icons/jhonn-sol-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/jhonn-sol-icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
