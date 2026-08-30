@@ -1009,6 +1009,185 @@
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-6px); }
         }
+
+        /* Carta editable + reacciones */
+        .letter-textarea {
+            display: none;
+            width: 100%;
+            min-height: 220px;
+            margin-top: 12px;
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: var(--bg-soft);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: vertical;
+        }
+
+        .letter-textarea.editing {
+            display: block;
+        }
+
+        .letter-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .reactions-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .reaction-btn {
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .reaction-btn:hover {
+            transform: translateY(-2px);
+            background: var(--card-2);
+        }
+
+        /* Contador de visitas */
+        .visits-counter {
+            margin-top: 16px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        /* Fechas especiales */
+        .special-dates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .special-date-card {
+            background: var(--bg-soft);
+            border-radius: 18px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .special-date-card .icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .special-date-card strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .special-date-card.unlocked {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(236, 72, 153, 0.15));
+        }
+
+        /* Fecha en fotos de galería */
+        .gallery-date {
+            position: absolute;
+            bottom: 6px;
+            left: 6px;
+            background: rgba(0, 0, 0, 0.55);
+            color: #fff;
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 999px;
+        }
+
+        /* Progreso de bucket list */
+        .bucket-progress {
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        .bucket-progress-bar {
+            width: 100%;
+            height: 10px;
+            border-radius: 999px;
+            background: var(--bg-soft);
+            overflow: hidden;
+        }
+
+        .bucket-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(135deg, #ef4444, #ec4899);
+            transition: width 0.4s ease;
+        }
+
+        .bucket-progress span {
+            display: block;
+            margin-top: 6px;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        /* Apodos din\u00e1micos */
+        .nickname-card {
+            position: relative;
+        }
+
+        .nickname-delete {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--muted);
+            transition: var(--transition);
+        }
+
+        .nickname-delete:hover {
+            color: #ef4444;
+            transform: scale(1.15);
+        }
+
+        .nickname-add-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .nickname-add-row input {
+            flex: 1;
+            min-width: 140px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg-soft);
+            color: var(--text);
+        }
+
+        .nickname-add-row button {
+            padding: 10px 18px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #ef4444, #ec4899);
+            color: #fff;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .nickname-add-row button:hover {
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 
@@ -1127,26 +1306,17 @@
                                 <p class="envelope-hint">Toca el sobre para abrirlo</p>
                             </div>
                             <div class="letter-content" id="letterContent">
-                                <p>Sol, mi amor:</p>
-                                <br>
-                                <p>
-                                    Desde el 5 de agosto no ha pasado un solo día en el que no piense en ti.
-                                    Todavía recuerdo cómo empezó todo, esa sensación de que algo especial
-                                    estaba por comenzar, y no me equivoqué.
-                                </p>
-                                <br>
-                                <p>
-                                    Eres esa persona que llegó a poner orden en mi caos, que me hace reír
-                                    cuando menos lo espero y que me da paz con solo estar cerca. Contigo
-                                    todo se siente más simple, más bonito, más nuestro.
-                                </p>
-                                <br>
-                                <p>
-                                    Quiero seguir construyendo historia contigo, quiero más días 5 de agosto,
-                                    más risas, más planes, más nosotros. Gracias por elegirme cada día.
-                                </p>
-                                <br>
-                                <p>Te amo, Jhonn 🤍</p>
+                                <div id="letterBody"></div>
+                                <textarea id="letterTextarea" class="letter-textarea" rows="10"></textarea>
+                                <div class="letter-actions">
+                                    <button type="button" class="btn btn-secondary" id="letterEditBtn">✏️ Editar carta</button>
+                                    <button type="button" class="btn btn-primary" id="letterSaveBtn" style="display:none;">Guardar</button>
+                                </div>
+                                <div class="reactions-row" id="letterReactions">
+                                    <button type="button" class="reaction-btn" data-emoji="❤️">❤️ <span>0</span></button>
+                                    <button type="button" class="reaction-btn" data-emoji="😍">😍 <span>0</span></button>
+                                    <button type="button" class="reaction-btn" data-emoji="🥹">🥹 <span>0</span></button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1174,6 +1344,14 @@
                             <div class="countdown-unit"><strong id="tMinutes">0</strong><span>Min</span></div>
                             <div class="countdown-unit"><strong id="tSeconds">0</strong><span>Seg</span></div>
                         </div>
+                        <p class="visits-counter" id="visitsCounter"></p>
+                    </div>
+
+                    <!-- Fechas Especiales -->
+                    <div style="margin-top: 40px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px;">
+                        <h2 style="text-align: center; margin-bottom: 8px;">Fechas especiales</h2>
+                        <p style="text-align: center; color: var(--muted);">Lo que celebramos cada año</p>
+                        <div class="special-dates-grid" id="specialDatesGrid"></div>
                     </div>
 
                     <!-- Galería de Momentos -->
@@ -1220,20 +1398,12 @@
                     <div style="margin-top: 40px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px;">
                         <h2 style="text-align: center; margin-bottom: 8px;">Solo cosas de nosotros</h2>
                         <p style="text-align: center; color: var(--muted);">Apodos y bromas internas de Jhonn y Sol</p>
-                        <div class="nickname-grid">
-                            <div class="nickname-card">
-                                <strong>Sol ☀️</strong>
-                                <span>Porque iluminas hasta mis peores días</span>
-                            </div>
-                            <div class="nickname-card">
-                                <strong>Nuestra frase</strong>
-                                <span>Agrega aquí esa frase que solo ustedes entienden</span>
-                            </div>
-                            <div class="nickname-card">
-                                <strong>Ese chiste interno</strong>
-                                <span>Agrega aquí esa anécdota que siempre los hace reír</span>
-                            </div>
-                        </div>
+                        <div class="nickname-grid" id="nicknameGrid"></div>
+                        <form class="nickname-add-row" id="nicknameAddForm">
+                            <input type="text" id="nicknameTitle" placeholder="Título (ej. Nuestra frase)" maxlength="40" required />
+                            <input type="text" id="nicknameDesc" placeholder="Descripción" maxlength="120" required />
+                            <button type="submit">Agregar</button>
+                        </form>
                     </div>
 
                     <!-- Notas para el otro -->
@@ -1281,6 +1451,10 @@
                     <div style="margin-top: 40px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px;">
                         <h2 style="text-align: center; margin-bottom: 8px;">Nuestra bucket list</h2>
                         <p style="text-align: center; color: var(--muted);">Cosas que quiero hacer contigo, Sol</p>
+                        <div class="bucket-progress" id="bucketProgress">
+                            <div class="bucket-progress-bar"><div class="bucket-progress-fill" id="bucketProgressFill"></div></div>
+                            <span id="bucketProgressText">0 de 0 cumplidas</span>
+                        </div>
                         <ul class="bucket-list" id="bucketList"></ul>
                         <form class="bucket-add-row" id="bucketAddForm">
                             <input type="text" id="bucketInput" placeholder="Agrega algo que quieras hacer juntos..." maxlength="80" required />
@@ -1606,6 +1780,37 @@
             });
         }
 
+        // Fechas especiales (cumpleaños y aniversario, se repiten cada año)
+        function initSpecialDates() {
+            const dates = [
+                { icon: '💑', title: 'Nuestro aniversario', desc: 'El día que todo comenzó', month: 8, day: 5 },
+                { icon: '🎂', title: 'Cumpleaños de Sol', desc: 'El día que naciste tú', month: 7, day: 30 },
+                { icon: '🎉', title: 'Cumpleaños de Jhonn', desc: 'El día que nací yo', month: 6, day: 25 }
+            ];
+            const grid = document.getElementById('specialDatesGrid');
+            const now = new Date();
+
+            dates.forEach(d => {
+                const card = document.createElement('div');
+                card.className = 'special-date-card';
+
+                const isToday = now.getMonth() === d.month - 1 && now.getDate() === d.day;
+                let target = new Date(now.getFullYear(), d.month - 1, d.day);
+                if (!isToday && target < now) {
+                    target = new Date(now.getFullYear() + 1, d.month - 1, d.day);
+                }
+
+                if (isToday) {
+                    card.classList.add('unlocked');
+                    card.innerHTML = `<div class="icon">${d.icon}</div><strong>${d.title}</strong><span>¡Hoy! 🎉 ${d.desc}</span>`;
+                } else {
+                    const diffDays = Math.ceil((target - now) / 86400000);
+                    card.innerHTML = `<div class="icon">${d.icon}</div><strong>${d.title}</strong><span>Faltan ${diffDays} días</span>`;
+                }
+                grid.appendChild(card);
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             spawnHearts();
             startTimeTogether();
@@ -1615,6 +1820,7 @@
             initWheel();
             initSurprise();
             initMusic();
+            initSpecialDates();
         });
     </script>
 
@@ -1622,7 +1828,8 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
         import {
             getFirestore, collection, addDoc, deleteDoc, doc,
-            updateDoc, onSnapshot, query, orderBy, serverTimestamp
+            updateDoc, onSnapshot, query, orderBy, serverTimestamp,
+            getDoc, setDoc, increment
         } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -1669,9 +1876,16 @@
 
         onSnapshot(bucketQuery, (snapshot) => {
             listEl.innerHTML = '';
+            let doneCount = 0;
             snapshot.forEach((docSnap) => {
-                listEl.appendChild(renderItem(docSnap.id, docSnap.data()));
+                const data = docSnap.data();
+                if (data.done) doneCount++;
+                listEl.appendChild(renderItem(docSnap.id, data));
             });
+            const total = snapshot.size;
+            const percent = total ? Math.round((doneCount / total) * 100) : 0;
+            document.getElementById('bucketProgressFill').style.width = percent + '%';
+            document.getElementById('bucketProgressText').textContent = `${doneCount} de ${total} cumplidas`;
         });
 
         form.addEventListener('submit', async (e) => {
@@ -1721,9 +1935,13 @@
             const div = document.createElement('div');
             div.className = 'gallery-item';
             div.dataset.url = data.url;
+            const dateLabel = data.createdAt?.toDate
+                ? data.createdAt.toDate().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
+                : '';
             div.innerHTML = `
                 <img src="${data.url}" alt="Foto" />
                 <button type="button" class="gallery-delete" title="Eliminar">🗑️</button>
+                ${dateLabel ? `<span class="gallery-date">${dateLabel}</span>` : ''}
             `;
             div.querySelector('.gallery-delete').addEventListener('click', async (e) => {
                 e.stopPropagation();
@@ -1796,6 +2014,121 @@
             if (!author || !text) return;
             await addDoc(messagesRef, { author, text, createdAt: serverTimestamp() });
             messageText.value = '';
+        });
+
+        // Carta editable + reacciones (Firestore doc content/letter)
+        const letterDocRef = doc(db, 'content', 'letter');
+        const letterBody = document.getElementById('letterBody');
+        const letterTextarea = document.getElementById('letterTextarea');
+        const letterEditBtn = document.getElementById('letterEditBtn');
+        const letterSaveBtn = document.getElementById('letterSaveBtn');
+        const letterReactions = document.getElementById('letterReactions');
+
+        const DEFAULT_LETTER = `Sol, mi amor:
+
+Desde el 5 de agosto no ha pasado un solo día en el que no piense en ti. Todavía recuerdo cómo empezó todo, esa sensación de que algo especial estaba por comenzar, y no me equivoqué.
+
+Eres esa persona que llegó a poner orden en mi caos, que me hace reír cuando menos lo espero y que me da paz con solo estar cerca. Contigo todo se siente más simple, más bonito, más nuestro.
+
+Quiero seguir construyendo historia contigo, quiero más días 5 de agosto, más risas, más planes, más nosotros. Gracias por elegirme cada día.
+
+Te amo, Jhonn 🤍`;
+
+        function renderLetterText(text) {
+            letterBody.innerHTML = text.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('<br>');
+        }
+
+        onSnapshot(letterDocRef, (docSnap) => {
+            const data = docSnap.exists() ? docSnap.data() : {};
+            const text = data.text || DEFAULT_LETTER;
+            renderLetterText(text);
+            letterTextarea.value = text;
+            const reactions = data.reactions || {};
+            letterReactions.querySelectorAll('.reaction-btn').forEach(btn => {
+                const emoji = btn.dataset.emoji;
+                btn.querySelector('span').textContent = reactions[emoji] || 0;
+            });
+        });
+
+        letterEditBtn.addEventListener('click', () => {
+            const editing = letterTextarea.classList.toggle('editing');
+            letterBody.style.display = editing ? 'none' : 'block';
+            letterSaveBtn.style.display = editing ? 'inline-flex' : 'none';
+            letterEditBtn.textContent = editing ? 'Cancelar' : '✏️ Editar carta';
+        });
+
+        letterSaveBtn.addEventListener('click', async () => {
+            const text = letterTextarea.value.trim();
+            if (!text) return;
+            await setDoc(letterDocRef, { text }, { merge: true });
+            letterTextarea.classList.remove('editing');
+            letterBody.style.display = 'block';
+            letterSaveBtn.style.display = 'none';
+            letterEditBtn.textContent = '✏️ Editar carta';
+        });
+
+        letterReactions.querySelectorAll('.reaction-btn').forEach((btn) => {
+            btn.addEventListener('click', async () => {
+                const emoji = btn.dataset.emoji;
+                await setDoc(letterDocRef, { reactions: { [emoji]: increment(1) } }, { merge: true });
+            });
+        });
+
+        // Apodos y bromas internas (din\u00e1mico)
+        const nicknameRef = collection(db, 'nicknames');
+        const nicknameQuery = query(nicknameRef, orderBy('createdAt', 'asc'));
+        const nicknameGrid = document.getElementById('nicknameGrid');
+        const nicknameForm = document.getElementById('nicknameAddForm');
+        const nicknameTitleInput = document.getElementById('nicknameTitle');
+        const nicknameDescInput = document.getElementById('nicknameDesc');
+
+        function renderNickname(id, data) {
+            const div = document.createElement('div');
+            div.className = 'nickname-card';
+            div.innerHTML = `
+                <strong></strong>
+                <span></span>
+                <button type="button" class="nickname-delete" title="Eliminar">🗑️</button>
+            `;
+            div.querySelector('strong').textContent = data.title;
+            div.querySelector('span').textContent = data.desc;
+            div.querySelector('.nickname-delete').addEventListener('click', () => deleteDoc(doc(db, 'nicknames', id)));
+            return div;
+        }
+
+        onSnapshot(nicknameQuery, (snapshot) => {
+            nicknameGrid.innerHTML = '';
+            if (snapshot.empty) {
+                const seed = document.createElement('div');
+                seed.className = 'nickname-card';
+                seed.innerHTML = '<strong>Sol ☀️</strong><span>Porque iluminas hasta mis peores días</span>';
+                nicknameGrid.appendChild(seed);
+            }
+            snapshot.forEach((docSnap) => {
+                nicknameGrid.appendChild(renderNickname(docSnap.id, docSnap.data()));
+            });
+        });
+
+        nicknameForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = nicknameTitleInput.value.trim();
+            const desc = nicknameDescInput.value.trim();
+            if (!title || !desc) return;
+            await addDoc(nicknameRef, { title, desc, createdAt: serverTimestamp() });
+            nicknameForm.reset();
+        });
+
+        // Contador de visitas
+        const visitsDocRef = doc(db, 'stats', 'visits');
+        const visitsCounterEl = document.getElementById('visitsCounter');
+
+        onSnapshot(visitsDocRef, (docSnap) => {
+            const count = docSnap.exists() ? (docSnap.data().count || 0) : 0;
+            visitsCounterEl.textContent = `Sol ha entrado ${count} ${count === 1 ? 'vez' : 'veces'} a esta página 💕`;
+        });
+
+        document.addEventListener('private:unlocked', () => {
+            setDoc(visitsDocRef, { count: increment(1), lastVisit: serverTimestamp() }, { merge: true });
         });
     </script>
 </body>
