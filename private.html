@@ -21,6 +21,10 @@
     <link rel="stylesheet" href="style.css" />
     <script src="pwa.js"></script>
     <style>
+        [hidden] {
+            display: none !important;
+        }
+
         .pin-screen {
             position: fixed;
             inset: 0;
@@ -412,10 +416,34 @@
             overflow: hidden;
         }
 
-        .gallery-item img {
+        .gallery-item img,
+        .gallery-item video {
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+
+        .gallery-video-placeholder {
+            display: grid;
+            width: 100%;
+            height: 100%;
+            place-items: center;
+            background: var(--bg-soft);
+            color: var(--text);
+            font-size: 2rem;
+        }
+
+        .gallery-description {
+            position: absolute;
+            right: 8px;
+            bottom: 38px;
+            left: 8px;
+            padding: 6px 8px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.58);
+            color: #fff;
+            font-size: 0.78rem;
+            line-height: 1.25;
         }
 
         .gallery-delete {
@@ -620,6 +648,87 @@
             font-size: 0.95rem;
             pointer-events: auto;
             animation: slideIn 0.3s ease-out;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 44px;
+            border-left: 4px solid #ec4899;
+        }
+
+        .notification button {
+            background: rgba(255, 255, 255, 0.15) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            color: inherit !important;
+            padding: 4px 8px !important;
+            border-radius: 4px !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            font-weight: bold !important;
+        }
+
+        .notification button:hover {
+            background: rgba(255, 255, 255, 0.25) !important;
+        }
+
+        /* Notificaciones flotantes con íconos */
+        .floating-notifications {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: auto;
+        }
+
+        .floating-notification {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ec4899, #f43f5e);
+            border: 3px solid var(--card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(236, 72, 153, 0.4);
+            animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .floating-notification:hover {
+            transform: scale(1.15);
+            box-shadow: 0 12px 30px rgba(236, 72, 153, 0.6);
+        }
+
+        .floating-notification.badge::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #16a34a;
+            border-radius: 50%;
+            top: -4px;
+            right: -4px;
+            border: 2px solid var(--card);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            60% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
         }
 
         @keyframes slideIn {
@@ -646,6 +755,35 @@
 
         .notification.removing {
             animation: slideOut 0.3s ease-out forwards;
+        }
+
+        .floating-notification.removing {
+            animation: popOut 0.3s ease-out forwards;
+        }
+
+        @keyframes popOut {
+            0% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0) rotate(180deg);
+                opacity: 0;
+            }
+        }
+
+        .highlight {
+            animation: highlightPulse 0.6s ease-in-out;
+        }
+
+        @keyframes highlightPulse {
+            0%, 100% {
+                background-color: var(--card);
+            }
+            50% {
+                background-color: rgba(236, 72, 153, 0.15);
+                box-shadow: 0 0 20px rgba(236, 72, 153, 0.3);
+            }
         }
 
         .playlist-list button {
@@ -779,6 +917,10 @@
 
         .quiz-result.show {
             display: block;
+        }
+
+        .form-toggle {
+            margin-top: 16px;
         }
 
         /* Ruleta */
@@ -1801,11 +1943,11 @@
                     <!-- Galería de Momentos -->
                     <div style="margin-top: 40px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px;">
                         <h2 style="text-align: center; margin-bottom: 8px;">Galería de momentos</h2>
-                        <p style="text-align: center; color: var(--muted);">Un espacio para nuestras fotos favoritas</p>
+                        <p style="text-align: center; color: var(--muted);">Fotos y videos cortos de nuestros momentos favoritos</p>
                         <div class="gallery-grid" id="galleryGrid"></div>
                         <form class="gallery-upload-row" id="galleryUploadForm">
-                            <input type="file" id="galleryInput" accept="image/*" required />
-                            <button type="submit">Subir foto</button>
+                            <input type="file" id="galleryInput" accept="image/*,video/mp4,video/webm" required hidden />
+                            <button type="button" id="galleryUploadBtn">Subir foto o video</button>
                         </form>
                     </div>
 
@@ -1814,7 +1956,8 @@
                         <h2 style="text-align: center; margin-bottom: 8px;">Nuestra playlist</h2>
                         <p style="text-align: center; color: var(--muted);">Canciones que nos recuerdan a nosotros</p>
                         <ul class="playlist-list" id="playlistList"></ul>
-                        <form class="playlist-add-row" id="playlistAddForm">
+                        <button type="button" class="btn btn-secondary form-toggle" data-form-toggle="playlistAddForm" data-open-label="Agregar canción">Agregar canción</button>
+                        <form class="playlist-add-row" id="playlistAddForm" hidden>
                             <div style="display: flex; gap: 8px; margin-bottom: 12px;">
                                 <label style="flex: 1; display: flex; align-items: center; gap: 6px; cursor: pointer;">
                                     <input type="radio" name="musicSource" value="spotify" checked /> Spotify
@@ -1832,16 +1975,14 @@
                                 <input id="playlistUrl" type="url" placeholder="Enlace de Spotify" required />
                             </div>
                             <div id="youtubeInputField" style="display: none;">
-                                <input id="playlistYoutubeUrl" type="url" placeholder="URL de YouTube (se extraerá el audio)" />
-                                <small style="color: var(--muted); display: block; margin-top: 4px;">Nota: Se usará un servicio para convertir el audio</small>
+                                <input id="playlistYoutubeUrl" type="url" placeholder="Enlace de video de YouTube" />
                             </div>
                             <div id="mp3InputField" style="display: none;">
-                                <input id="playlistMp3Url" type="url" placeholder="URL directa del archivo MP3" />
-                                <small style="color: var(--muted); display: block; margin-top: 4px;">O sube un archivo:
-                                <input type="file" id="playlistMp3File" accept="audio/mp3" style="margin-top: 4px;" /></small>
+                                <input type="file" id="playlistMp3File" accept=".mp3,audio/mpeg" />
                             </div>
                             
-                            <button type="submit">Agregar canción</button>
+                            <button type="submit">Guardar canción</button>
+                            <div id="playlistStatus" style="margin-top: 10px; min-height: 20px;"></div>
                         </form>
                     </div>
 
@@ -1850,7 +1991,8 @@
                         <h2 style="text-align: center; margin-bottom: 8px;">Solo cosas de nosotros</h2>
                         <p style="text-align: center; color: var(--muted);">Apodos y bromas internas de Jhonn y Sol</p>
                         <div class="nickname-grid" id="nicknameGrid"></div>
-                        <form class="nickname-add-row" id="nicknameAddForm">
+                        <button type="button" class="btn btn-secondary form-toggle" data-form-toggle="nicknameAddForm" data-open-label="Agregar apodo">Agregar apodo</button>
+                        <form class="nickname-add-row" id="nicknameAddForm" hidden>
                             <input type="text" id="nicknameTitle" placeholder="Título (ej. Nuestra frase)" maxlength="40" required />
                             <input type="text" id="nicknameDesc" placeholder="Descripción" maxlength="120" required />
                             <button type="submit">Agregar</button>
@@ -1862,7 +2004,8 @@
                         <h2 style="text-align: center; margin-bottom: 8px;">Notas para el otro 💌</h2>
                         <p style="text-align: center; color: var(--muted);">Déjense mensajes que quieran leer después</p>
                         <ul class="messages-list" id="messagesList"></ul>
-                        <form class="message-form" id="messageForm">
+                        <button type="button" class="btn btn-secondary form-toggle" data-form-toggle="messageForm" data-open-label="Escribir mensaje">Escribir mensaje</button>
+                        <form class="message-form" id="messageForm" hidden>
                             <textarea id="messageText" placeholder="Escribe tu mensaje..." maxlength="300" required></textarea>
                             <button type="submit">Enviar mensaje</button>
                         </form>
@@ -1872,7 +2015,8 @@
                         <div class="shared-card">
                             <h2>Muro de momentos</h2>
                             <p>Pequeñas cosas que queremos recordar.</p>
-                            <form class="simple-form" id="momentForm">
+                            <button type="button" class="btn btn-secondary form-toggle" data-form-toggle="momentForm" data-open-label="Publicar momento">Publicar momento</button>
+                            <form class="simple-form" id="momentForm" hidden>
                                 <textarea id="momentText" maxlength="300" placeholder="Comparte un momento..."></textarea>
                                 <button type="submit">Publicar</button>
                             </form>
@@ -1882,7 +2026,8 @@
                         <div class="shared-card">
                             <h2>Planes juntos</h2>
                             <p>Nuestras próximas citas y aventuras.</p>
-                            <form class="inline-form" id="planForm">
+                            <button type="button" class="btn btn-secondary form-toggle" data-form-toggle="planForm" data-open-label="Agregar plan">Agregar plan</button>
+                            <form class="inline-form" id="planForm" hidden>
                                 <input id="planText" maxlength="100" placeholder="Nuestro próximo plan" required />
                                 <input id="planDate" type="date" required />
                                 <button type="submit">Guardar</button>
@@ -1893,7 +2038,8 @@
                         <div class="shared-card">
                             <h2>Pregunta de hoy</h2>
                             <p id="dailyQuestion"></p>
-                            <form class="simple-form" id="dailyAnswerForm">
+                            <button type="button" class="btn btn-secondary form-toggle" data-form-toggle="dailyAnswerForm" data-open-label="Responder">Responder</button>
+                            <form class="simple-form" id="dailyAnswerForm" hidden>
                                 <textarea id="dailyAnswer" maxlength="250" placeholder="Tu respuesta..."></textarea>
                                 <button type="submit">Responder</button>
                             </form>
@@ -1922,7 +2068,8 @@
 
                         <div class="shared-card">
                             <h2>Tarro de recuerdos</h2>
-                            <form class="inline-form" id="memoryForm">
+                            <button type="button" class="btn btn-secondary form-toggle" data-form-toggle="memoryForm" data-open-label="Guardar recuerdo">Guardar recuerdo</button>
+                            <form class="inline-form" id="memoryForm" hidden>
                                 <input id="memoryText" maxlength="180" placeholder="Guarda un recuerdo" required />
                                 <button type="submit">Guardar</button>
                             </form>
@@ -1932,7 +2079,8 @@
 
                         <div class="shared-card">
                             <h2>Reto semanal</h2>
-                            <form class="inline-form" id="challengeForm">
+                            <button type="button" class="btn btn-secondary form-toggle" data-form-toggle="challengeForm" data-open-label="Proponer reto">Proponer reto</button>
+                            <form class="inline-form" id="challengeForm" hidden>
                                 <input id="challengeText" maxlength="140" placeholder="Propongan un reto para esta semana" required />
                                 <button type="submit">Proponer</button>
                             </form>
@@ -1941,7 +2089,8 @@
 
                         <div class="shared-card">
                             <h2>Lugares de nosotros</h2>
-                            <form class="inline-form" id="placeForm">
+                            <button type="button" class="btn btn-secondary form-toggle" data-form-toggle="placeForm" data-open-label="Agregar lugar">Agregar lugar</button>
+                            <form class="inline-form" id="placeForm" hidden>
                                 <input id="placeName" maxlength="70" placeholder="Nombre del lugar" required />
                                 <input id="placeNote" maxlength="120" placeholder="¿Por qué es especial?" required />
                                 <button type="submit">Agregar</button>
@@ -1951,7 +2100,8 @@
 
                         <div class="shared-card">
                             <h2>Cápsula del tiempo</h2>
-                            <form class="simple-form" id="capsuleForm">
+                            <button type="button" class="btn btn-secondary form-toggle" data-form-toggle="capsuleForm" data-open-label="Cerrar cápsula">Cerrar cápsula</button>
+                            <form class="simple-form" id="capsuleForm" hidden>
                                 <textarea id="capsuleText" maxlength="300" placeholder="Un mensaje para el futuro..."></textarea>
                                 <input id="capsuleDate" type="date" required />
                                 <button type="submit">Cerrar cápsula</button>
@@ -1961,7 +2111,8 @@
 
                         <div class="shared-card">
                             <h2>Preguntas para nosotros</h2>
-                            <form class="simple-form" id="coupleQuestionForm">
+                            <button type="button" class="btn btn-secondary form-toggle" data-form-toggle="coupleQuestionForm" data-open-label="Agregar pregunta">Agregar pregunta</button>
+                            <form class="simple-form" id="coupleQuestionForm" hidden>
                                 <input id="coupleQuestionText" maxlength="180" placeholder="Escribe una pregunta para ambos" required />
                                 <button type="submit">Agregar pregunta</button>
                             </form>
@@ -1971,17 +2122,20 @@
 
                     <!-- Quiz -->
                     <div style="margin-top: 40px; padding: 40px; background: var(--card); border: 1px solid var(--border); border-radius: 28px;">
-                        <h2 style="text-align: center; margin-bottom: 8px;">¿Qué tanto me conoces?</h2>
-                        <p style="text-align: center; color: var(--muted);">Un juego rápido para ti, Sol</p>
-                        <div class="quiz-question">
-                            <p style="font-weight: 600;">¿Qué es lo que más me gusta de estar contigo?</p>
-                            <div class="quiz-options" id="quizOptions">
-                                <div class="quiz-option" data-correct="false">Ver películas juntos</div>
-                                <div class="quiz-option" data-correct="true">Sentir que puedo ser yo mismo</div>
-                                <div class="quiz-option" data-correct="false">Que me cocines algo rico</div>
-                            </div>
-                            <p class="quiz-result" id="quizResult"></p>
-                        </div>
+                        <h2 style="text-align: center; margin-bottom: 8px;">¿Qué tanto nos conocemos?</h2>
+                        <p style="text-align: center; color: var(--muted);">Crea una pregunta sobre ti y deja que el otro demuestre cuánto te conoce.</p>
+                        <p class="quiz-result show" id="quizScores"></p>
+                        <button type="button" class="btn btn-primary" id="quizRandomBtn">Pregunta rápida</button>
+                        <button type="button" class="btn btn-secondary form-toggle" data-form-toggle="quizQuestionForm" data-open-label="Crear pregunta">Crear pregunta</button>
+                        <form class="simple-form" id="quizQuestionForm" hidden>
+                            <input id="quizQuestionText" maxlength="180" placeholder="Pregunta sobre ti" required />
+                            <input id="quizCorrectAnswer" maxlength="100" placeholder="Respuesta correcta" required />
+                            <input id="quizWrongAnswerOne" maxlength="100" placeholder="Opción falsa 1" required />
+                            <input id="quizWrongAnswerTwo" maxlength="100" placeholder="Opción falsa 2" required />
+                            <input id="quizWrongAnswerThree" maxlength="100" placeholder="Opción falsa 3" required />
+                            <button type="submit">Agregar pregunta</button>
+                        </form>
+                        <div class="quiz-question" id="quizQuestionsList"></div>
                     </div>
 
                     <!-- Ruleta de Citas -->
@@ -2007,7 +2161,8 @@
                             <span id="bucketProgressText">0 de 0 cumplidas</span>
                         </div>
                         <ul class="bucket-list" id="bucketList"></ul>
-                        <form class="bucket-add-row" id="bucketAddForm">
+                        <button type="button" class="btn btn-secondary form-toggle" data-form-toggle="bucketAddForm" data-open-label="Agregar idea">Agregar idea</button>
+                        <form class="bucket-add-row" id="bucketAddForm" hidden>
                             <input type="text" id="bucketInput" placeholder="Agrega algo que quieras hacer juntos..." maxlength="80" required />
                             <button type="submit">Agregar</button>
                         </form>
@@ -2025,6 +2180,7 @@
         </main>
 
         <div class="notifications-container" id="notificationsContainer"></div>
+        <div class="floating-notifications" id="floatingNotifications"></div>
 
         <footer class="site-footer">
             <div class="container footer-row">
@@ -2059,6 +2215,7 @@
                 <div id="spotifyQueue"></div>
             </div>
             <div id="spotifyEmbedContainer" class="spotify-embed-hidden"></div>
+            <div id="youtubeEmbedContainer" class="spotify-embed-hidden"></div>
             <audio id="audioPlayer" style="display: none;"></audio>
         </div>
         <canvas id="confettiCanvas"></canvas>
@@ -2068,8 +2225,10 @@
     <script src="private.js"></script>
     <script>
         window.onSpotifyIframeApiReady = (IFrameAPI) => { window.__spotifyIframeAPI = IFrameAPI; };
+        window.onYouTubeIframeAPIReady = () => { window.__youtubeIframeAPIReady = true; };
     </script>
     <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
+    <script src="https://www.youtube.com/iframe_api" async></script>
     <script>
         function spawnHearts() {
             const container = document.getElementById('floatingHearts');
@@ -2115,40 +2274,50 @@
             });
         }
 
+        function initFormToggles() {
+            document.querySelectorAll('[data-form-toggle]').forEach((button) => {
+                const form = document.getElementById(button.dataset.formToggle);
+                if (!form) return;
+                button.setAttribute('aria-expanded', 'false');
+                button.addEventListener('click', () => {
+                    form.hidden = !form.hidden;
+                    const isOpen = !form.hidden;
+                    button.textContent = isOpen ? 'Cancelar' : button.dataset.openLabel;
+                    button.setAttribute('aria-expanded', String(isOpen));
+                    if (isOpen) form.querySelector('input, textarea, select')?.focus();
+                });
+            });
+        }
+
         // Galería con lightbox
         function initGallery() {
             const lightbox = document.getElementById('lightbox');
             const lightboxBox = document.getElementById('lightboxBox');
-            document.getElementById('galleryGrid').addEventListener('click', (e) => {
+            document.getElementById('galleryGrid').addEventListener('click', async (e) => {
                 if (e.target.closest('.gallery-delete')) return;
                 const item = e.target.closest('.gallery-item');
                 if (!item) return;
+                if (item.dataset.mediaType === 'video' && !item.dataset.url) {
+                    lightboxBox.textContent = 'Cargando video...';
+                    lightbox.classList.add('open');
+                    try {
+                        await window.loadGalleryVideo?.(item.id.replace('gallery-', ''), item);
+                    } catch {
+                        lightboxBox.textContent = 'No se pudo cargar el video.';
+                        return;
+                    }
+                }
                 if (item.dataset.url) {
-                    lightboxBox.innerHTML = `<img src="${item.dataset.url}" style="width:100%;height:100%;object-fit:contain;" />`;
+                    lightboxBox.innerHTML = item.dataset.mediaType === 'video'
+                        ? `<video src="${item.dataset.url}" controls autoplay style="width:100%;height:100%;object-fit:contain;"></video>`
+                        : `<img src="${item.dataset.url}" style="width:100%;height:100%;object-fit:contain;" />`;
                 } else {
                     lightboxBox.textContent = item.dataset.photo || '📸';
                 }
                 lightbox.classList.add('open');
             });
+            lightboxBox.addEventListener('click', (e) => e.stopPropagation());
             lightbox.addEventListener('click', () => lightbox.classList.remove('open'));
-        }
-
-        // Quiz
-        function initQuiz() {
-            const options = document.querySelectorAll('#quizOptions .quiz-option');
-            const result = document.getElementById('quizResult');
-            options.forEach(option => {
-                option.addEventListener('click', () => {
-                    if (option.classList.contains('correct') || option.classList.contains('wrong')) return;
-                    const isCorrect = option.dataset.correct === 'true';
-                    option.classList.add(isCorrect ? 'correct' : 'wrong');
-                    result.textContent = isCorrect
-                        ? '¡Exacto, Sol! Me conoces perfecto 💗'
-                        : 'Casi, pero lo que más amo es sentir que puedo ser yo mismo contigo 💗';
-                    result.classList.add('show');
-                    options.forEach(o => o.style.pointerEvents = 'none');
-                });
-            });
         }
 
         // Ruleta de citas
@@ -2228,7 +2397,7 @@
             animate();
         }
 
-        // Música de fondo (Spotify iFrame API: control real de play/pause y progreso)
+        // Música de fondo: soporta Spotify y archivos MP3 locales
         function initMusic() {
             const btn = document.getElementById('musicPlayBtn');
             const prevBtn = document.getElementById('musicPrevBtn');
@@ -2238,23 +2407,37 @@
             const panel = document.getElementById('spotifyPanel');
             const hint = document.getElementById('musicHint');
             const embedContainer = document.getElementById('spotifyEmbedContainer');
+            const youtubeEmbedContainer = document.getElementById('youtubeEmbedContainer');
             const queuePanel = document.getElementById('spotifyQueue');
             const ringFill = document.getElementById('progressRingFill');
+            const audioPlayer = document.getElementById('audioPlayer');
 
             const RADIUS = 24;
             const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
             ringFill.style.strokeDasharray = String(CIRCUMFERENCE);
             ringFill.style.strokeDashoffset = String(CIRCUMFERENCE);
 
-            const DEFAULT_URI = 'spotify:track:37miw1ff4zH0LDuFrBvZ4i';
-            let queue = [
-                { title: 'Pero te conocí', uri: DEFAULT_URI },
-                { title: 'Sabes', uri: 'spotify:track:30brAfx64jxQMeUNUgDFaj' }
-            ];
+            const DEFAULT_URI = '';
+            let queue = [];
             let currentIndex = 0;
             let endHandled = false;
             let controller = null;
             let pendingUri = null;
+            let youtubePlayer = null;
+            let pendingYoutubeId = null;
+            let activeSource = 'spotify';
+
+            function isMp3Uri(uri) {
+                return typeof uri === 'string' && uri.startsWith('mp3:');
+            }
+
+            function isMp3FileUri(uri) {
+                return typeof uri === 'string' && uri.startsWith('mp3-file:');
+            }
+
+            function isYoutubeUri(uri) {
+                return typeof uri === 'string' && uri.startsWith('youtube:');
+            }
 
             function hideHint() {
                 hint.classList.remove('show');
@@ -2262,6 +2445,18 @@
 
             function updateButtonIcon(isPaused) {
                 btn.textContent = isPaused ? '▶' : '⏸';
+            }
+
+            function stopSpotifyController() {
+                if (controller && typeof controller.pause === 'function') {
+                    controller.pause();
+                }
+            }
+
+            function stopYoutubePlayer() {
+                if (youtubePlayer && typeof youtubePlayer.pauseVideo === 'function') {
+                    youtubePlayer.pauseVideo();
+                }
             }
 
             function bindController(c) {
@@ -2276,28 +2471,6 @@
                         setTimeout(() => playQueueItem(currentIndex + 1), 300);
                     }
                 });
-            }
-
-            function createOrSwitch(uri) {
-                const index = queue.findIndex((track) => track.uri === uri);
-                if (index >= 0) currentIndex = index;
-                endHandled = false;
-                if (controller) {
-                    controller.loadUri(uri);
-                    controller.play();
-                    return;
-                }
-                if (!window.__spotifyIframeAPI) {
-                    pendingUri = uri;
-                    return;
-                }
-                window.__spotifyIframeAPI.createController(embedContainer, { uri, width: '1', height: '1' }, bindController);
-            }
-
-            function playQueueItem(index) {
-                if (!queue.length) return;
-                currentIndex = (index + queue.length) % queue.length;
-                createOrSwitch(queue[currentIndex].uri);
             }
 
             function renderQueue() {
@@ -2315,39 +2488,168 @@
                 });
             }
 
+            function playMp3Track(uri) {
+                if (!audioPlayer) return;
+                const source = uri.replace(/^mp3:/, '');
+                activeSource = 'mp3';
+                stopSpotifyController();
+                stopYoutubePlayer();
+                audioPlayer.src = source;
+                audioPlayer.load();
+                audioPlayer.play();
+                updateButtonIcon(false);
+                ringFill.style.strokeDashoffset = '0';
+            }
+
+            function playYoutubeTrack(uri) {
+                const videoId = uri.replace(/^youtube:/, '');
+                activeSource = 'youtube';
+                stopSpotifyController();
+                audioPlayer.pause();
+                pendingYoutubeId = videoId;
+                if (!window.YT || !window.YT.Player) return;
+                if (!youtubePlayer) {
+                    youtubePlayer = new window.YT.Player(youtubeEmbedContainer, {
+                        width: '1',
+                        height: '1',
+                        videoId,
+                        playerVars: { autoplay: 1, playsinline: 1 },
+                        events: {
+                            onReady: (event) => {
+                                event.target.loadVideoById(pendingYoutubeId);
+                                event.target.playVideo();
+                                pendingYoutubeId = null;
+                            },
+                            onStateChange: (event) => {
+                                updateButtonIcon(event.data !== window.YT.PlayerState.PLAYING);
+                                if (event.data === window.YT.PlayerState.ENDED) playQueueItem(currentIndex + 1);
+                            }
+                        }
+                    });
+                    return;
+                }
+                youtubePlayer.loadVideoById(videoId);
+                youtubePlayer.playVideo();
+                pendingYoutubeId = null;
+            }
+
+            function createOrSwitch(uri) {
+                if (!uri) {
+                    updateButtonIcon(true);
+                    return;
+                }
+                const index = queue.findIndex((track) => track.uri === uri);
+                if (index >= 0) currentIndex = index;
+                endHandled = false;
+
+                if (isMp3FileUri(uri)) {
+                    const id = uri.replace(/^mp3-file:/, '');
+                    updateButtonIcon(true);
+                    window.loadPlaylistMp3?.(id)
+                        .then((audioUri) => createOrSwitch(audioUri))
+                        .catch(() => showNotification('No se pudo cargar este MP3.', '⚠️', 'playlistList'));
+                    return;
+                }
+
+                if (isMp3Uri(uri)) {
+                    playMp3Track(uri);
+                    renderQueue();
+                    return;
+                }
+
+                if (isYoutubeUri(uri)) {
+                    playYoutubeTrack(uri);
+                    renderQueue();
+                    return;
+                }
+
+                activeSource = 'spotify';
+                stopYoutubePlayer();
+                audioPlayer.pause();
+                if (controller) {
+                    controller.loadUri(uri);
+                    controller.play();
+                    return;
+                }
+                if (!window.__spotifyIframeAPI) {
+                    pendingUri = uri;
+                    return;
+                }
+                pendingUri = null;
+                window.__spotifyIframeAPI.createController(embedContainer, { uri, width: '1', height: '1' }, bindController);
+            }
+
+            function playQueueItem(index) {
+                if (!queue.length) return;
+                currentIndex = (index + queue.length) % queue.length;
+                const nextTrack = queue[currentIndex];
+                if (!nextTrack) return;
+                createOrSwitch(nextTrack.uri);
+                renderQueue();
+            }
+
             renderQueue();
 
             document.addEventListener('playlist:play', (event) => {
                 const uri = event.detail?.uri;
-                if (uri) createOrSwitch(uri);
+                if (uri) {
+                    createOrSwitch(uri);
+                    renderQueue();
+                }
             });
 
             document.addEventListener('playlist:queue', (event) => {
-                const sharedTracks = event.detail?.tracks || [];
-                queue = [
-                    { title: 'Pero te conocí', uri: DEFAULT_URI },
-                    { title: 'Sabes', uri: 'spotify:track:30brAfx64jxQMeUNUgDFaj' },
-                    ...sharedTracks
-                ];
-                currentIndex = Math.min(currentIndex, queue.length - 1);
+                const sharedTracks = (event.detail?.tracks || []).filter((track) => {
+                    const uri = track?.uri || '';
+                    return uri && uri !== DEFAULT_URI;
+                });
+                const normalized = sharedTracks.map((track) => ({
+                    title: track.title || 'Canción',
+                    uri: track.uri || DEFAULT_URI
+                }));
+
+                queue = [...normalized];
+                currentIndex = queue.length ? 0 : 0;
                 renderQueue();
             });
+
+            audioPlayer.addEventListener('play', () => updateButtonIcon(false));
+            audioPlayer.addEventListener('pause', () => updateButtonIcon(true));
+            audioPlayer.addEventListener('ended', () => playQueueItem(currentIndex + 1));
 
             // Si el script de Spotify aún no cargó, reintenta cuando esté listo
             const waitForApi = setInterval(() => {
                 if (window.__spotifyIframeAPI && pendingUri) {
-                    clearInterval(waitForApi);
                     createOrSwitch(pendingUri);
+                }
+                if (window.__youtubeIframeAPIReady && pendingYoutubeId) {
+                    playYoutubeTrack(`youtube:${pendingYoutubeId}`);
                 }
             }, 300);
 
             btn.addEventListener('click', () => {
                 hideHint();
-                if (controller) {
+                if (activeSource === 'spotify' && controller) {
                     controller.togglePlay();
-                } else {
-                    createOrSwitch(DEFAULT_URI);
+                    return;
                 }
+                if (activeSource === 'youtube' && youtubePlayer) {
+                    if (youtubePlayer.getPlayerState() === window.YT.PlayerState.PLAYING) {
+                        youtubePlayer.pauseVideo();
+                    } else {
+                        youtubePlayer.playVideo();
+                    }
+                    return;
+                }
+                if (audioPlayer && audioPlayer.src) {
+                    if (audioPlayer.paused) {
+                        audioPlayer.play();
+                    } else {
+                        audioPlayer.pause();
+                    }
+                    return;
+                }
+                createOrSwitch(DEFAULT_URI);
             });
 
             listBtn.addEventListener('click', (e) => {
@@ -2362,6 +2664,10 @@
                 hideHint();
                 if (controller) {
                     controller.play();
+                } else if (youtubePlayer) {
+                    youtubePlayer.playVideo();
+                } else if (audioPlayer && audioPlayer.src) {
+                    audioPlayer.play();
                 } else {
                     createOrSwitch(DEFAULT_URI);
                 }
@@ -2375,12 +2681,12 @@
                 }
             });
 
-            // Al desbloquear con el PIN, se intenta sonar automáticamente
-            // y se muestra un aviso por si el navegador bloquea el autoplay
             document.addEventListener('private:unlocked', () => {
-                createOrSwitch(DEFAULT_URI);
-                hint.classList.add('show');
-                setTimeout(hideHint, 6000);
+                if (queue.length) {
+                    createOrSwitch(queue[0].uri);
+                    hint.classList.add('show');
+                    setTimeout(hideHint, 6000);
+                }
             });
         }
 
@@ -2419,8 +2725,8 @@
             spawnHearts();
             startTimeTogether();
             initEnvelope();
+            initFormToggles();
             initGallery();
-            initQuiz();
             initWheel();
             initSurprise();
             initMusic();
@@ -2433,7 +2739,7 @@
         import {
             getFirestore, collection, addDoc, deleteDoc, doc,
             updateDoc, onSnapshot, query, orderBy, serverTimestamp,
-            getDoc, setDoc, increment
+            getDoc, getDocs, setDoc, increment
         } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
         import {
             getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence,
@@ -2469,6 +2775,14 @@
         function showAuthError(message) {
             authError.textContent = message;
             authError.classList.add('show');
+        }
+
+        function withTimeout(operation, message, timeoutMs = 20000) {
+            let timeoutId;
+            const timeout = new Promise((_, reject) => {
+                timeoutId = setTimeout(() => reject(new Error(message)), timeoutMs);
+            });
+            return Promise.race([operation, timeout]).finally(() => clearTimeout(timeoutId));
         }
 
         async function showAuthenticatedUser(user) {
@@ -2541,13 +2855,14 @@
         function renderItem(id, data) {
             const li = document.createElement('li');
             li.className = data.done ? 'done' : '';
+            const isOwner = data.authorId === (auth.currentUser?.uid || '');
             li.innerHTML = `
                 <span class="bucket-check"></span>
                 <div class="bucket-copy">
                     <span class="bucket-text"></span>
                     <small class="activity-meta"></small>
                 </div>
-                <button type="button" class="bucket-delete" title="Eliminar">🗑️</button>
+                ${isOwner ? '<button type="button" class="bucket-delete" title="Eliminar">🗑️</button>' : ''}
             `;
             li.querySelector('.bucket-text').textContent = data.text;
             li.querySelector('.activity-meta').textContent = formatActivity(data.createdAt, data.author);
@@ -2558,10 +2873,13 @@
             li.querySelector('.bucket-text').addEventListener('click', () => {
                 updateDoc(doc(db, 'bucketList', id), { done: !data.done });
             });
-            li.querySelector('.bucket-delete').addEventListener('click', (e) => {
-                e.stopPropagation();
-                deleteDoc(doc(db, 'bucketList', id));
-            });
+            const deleteBtn = li.querySelector('.bucket-delete');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteDoc(doc(db, 'bucketList', id));
+                });
+            }
 
             return li;
         }
@@ -2571,6 +2889,7 @@
             let doneCount = 0;
             snapshot.forEach((docSnap) => {
                 const data = docSnap.data();
+                checkAndNotifyChanges('bucketList', docSnap.id, data, '✅', '{author} agregó algo a la bucket list', 'bucketList');
                 if (data.done) doneCount++;
                 listEl.appendChild(renderItem(docSnap.id, data));
             });
@@ -2600,8 +2919,17 @@
         const galleryGrid = document.getElementById('galleryGrid');
         const galleryForm = document.getElementById('galleryUploadForm');
         const galleryInput = document.getElementById('galleryInput');
+        const galleryUploadBtn = document.getElementById('galleryUploadBtn');
+        let pendingGalleryDescription = '';
 
-        function compressImage(file, maxSize = 800, quality = 0.7) {
+        galleryUploadBtn.addEventListener('click', () => galleryInput.click());
+        galleryInput.addEventListener('change', () => {
+            if (!galleryInput.files.length) return;
+            pendingGalleryDescription = (window.prompt('Descripción opcional para este recuerdo:', '') || '').trim().slice(0, 180);
+            galleryForm.requestSubmit();
+        });
+
+        function compressImage(file, maxSize = 560, quality = 0.62) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = () => {
@@ -2629,28 +2957,86 @@
             });
         }
 
+        function getBase64Chunks(dataUrl, chunkSize = 600000) {
+            const base64 = String(dataUrl).split(',')[1] || '';
+            return base64.match(new RegExp(`.{1,${chunkSize}}`, 'g')) || [];
+        }
+
+        const playlistAudioCache = new Map();
+        window.loadPlaylistMp3 = async function loadPlaylistMp3(id) {
+            if (playlistAudioCache.has(id)) return playlistAudioCache.get(id);
+            const trackSnapshot = await getDoc(doc(db, 'playlist', id));
+            const track = trackSnapshot.data();
+            const chunksSnapshot = await getDocs(collection(db, 'playlist', id, 'chunks'));
+            const base64 = chunksSnapshot.docs
+                .sort((first, second) => first.id.localeCompare(second.id))
+                .map((entry) => entry.data().content || '')
+                .join('');
+            if (!base64) throw new Error('MP3 sin contenido');
+            const audioUri = `mp3:data:${track?.audioType || 'audio/mpeg'};base64,${base64}`;
+            playlistAudioCache.set(id, audioUri);
+            return audioUri;
+        };
+
+        function readFileAsDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error('No se pudo leer el archivo.'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        window.loadGalleryVideo = async function loadGalleryVideo(id, container) {
+            const snapshot = await getDocs(collection(db, 'gallery', id, 'chunks'));
+            const base64 = snapshot.docs
+                .sort((a, b) => a.id.localeCompare(b.id))
+                .map((entry) => entry.data().content || '')
+                .join('');
+            if (!base64) return;
+            const url = `data:${container.dataset.videoType || 'video/mp4'};base64,${base64}`;
+            container.dataset.url = url;
+        };
+
+        async function deleteGalleryItem(id, isVideo) {
+            if (isVideo) {
+                const chunks = await getDocs(collection(db, 'gallery', id, 'chunks'));
+                await Promise.all(chunks.docs.map((chunk) => deleteDoc(chunk.ref)));
+            }
+            await deleteDoc(doc(db, 'gallery', id));
+        }
+
         function renderGalleryItem(id, data) {
             const div = document.createElement('div');
             div.id = `gallery-${id}`;
             div.className = 'gallery-item';
-            div.dataset.url = data.url;
+            div.dataset.url = data.url || '';
+            div.dataset.mediaType = data.mediaType || 'image';
+            div.dataset.videoType = data.videoType || '';
             div.style.animation = 'slideInUp 0.3s ease-out';
             const dateLabel = data.createdAt?.toDate
                 ? data.createdAt.toDate().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
                 : '';
+            const isOwner = data.authorId === (auth.currentUser?.uid || '');
             div.innerHTML = `
-                <img src="${data.url}" alt="Foto" />
-                <button type="button" class="gallery-delete" title="Eliminar">🗑️</button>
-                <span class="gallery-date">${data.author || 'Foto compartida'}${dateLabel ? ` · ${dateLabel}` : ''}</span>
+                ${data.mediaType === 'video' ? '<div class="gallery-video-placeholder" aria-label="Video">▶</div>' : `<img src="${data.url}" alt="Foto" loading="lazy" />`}
+                ${isOwner ? '<button type="button" class="gallery-delete" title="Eliminar">🗑️</button>' : ''}
+                ${data.description ? '<span class="gallery-description"></span>' : ''}
+                <span class="gallery-date">${data.author || 'Archivo compartido'}${dateLabel ? ` · ${dateLabel}` : ''}</span>
                 <div class="gallery-reactions">
                     <button type="button" class="gallery-reaction" data-reaction="likes">👍 ${data.likes || 0}</button>
                     <button type="button" class="gallery-reaction" data-reaction="loves">❤️ ${data.loves || 0}</button>
                 </div>
             `;
-            div.querySelector('.gallery-delete').addEventListener('click', async (e) => {
-                e.stopPropagation();
-                await deleteDoc(doc(db, 'gallery', id));
-            });
+            const deleteBtn = div.querySelector('.gallery-delete');
+            const description = div.querySelector('.gallery-description');
+            if (description) description.textContent = data.description;
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    await deleteGalleryItem(id, data.mediaType === 'video');
+                });
+            }
             div.querySelectorAll('.gallery-reaction').forEach((button) => {
                 button.addEventListener('click', async (e) => {
                     e.stopPropagation();
@@ -2673,7 +3059,15 @@
                 
                 // Notificar si fue agregado por otra persona
                 if (data.authorId && data.authorId !== (auth.currentUser?.uid || '')) {
-                    checkAndNotifyChanges('gallery', id, data, '📸', '{author} compartió una foto');
+                    const isVideo = data.mediaType === 'video';
+                    checkAndNotifyChanges(
+                        'gallery',
+                        id,
+                        data,
+                        isVideo ? '🎬' : '📸',
+                        isVideo ? '{author} compartió un video' : '{author} compartió una foto',
+                        'galleryGrid'
+                    );
                 }
                 
                 // Si es nuevo, agregarlo sin limpiar todo
@@ -2714,24 +3108,56 @@
             e.preventDefault();
             const file = galleryInput.files[0];
             if (!file) return;
+            const isVideo = file.type === 'video/mp4' || file.type === 'video/webm';
+            if (!file.type.startsWith('image/') && !isVideo) {
+                alert('Elige una imagen, un video MP4 o un video WebM.');
+                return;
+            }
+            if (isVideo && file.size > 3 * 1024 * 1024) {
+                alert('El video debe pesar 3 MB o menos para no ralentizar la página.');
+                return;
+            }
             const submitBtn = galleryForm.querySelector('button');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Subiendo...';
             try {
-                const url = await compressImage(file);
-                await addDoc(galleryRef, {
-                    url,
-                    author: currentUserName,
-                    authorId: auth.currentUser?.uid || '',
-                    createdAt: serverTimestamp()
-                });
+                if (isVideo) {
+                    const dataUrl = await readFileAsDataUrl(file);
+                    const base64 = String(dataUrl).split(',')[1] || '';
+                    const videoRef = doc(galleryRef);
+                    const chunkSize = 600000;
+                    const chunks = base64.match(new RegExp(`.{1,${chunkSize}}`, 'g')) || [];
+                    await withTimeout(Promise.all(chunks.map((content, index) =>
+                        setDoc(doc(db, 'gallery', videoRef.id, 'chunks', String(index).padStart(4, '0')), { content })
+                    )), 'El video tardó demasiado en subir. Intenta con uno más corto.');
+                    await withTimeout(setDoc(videoRef, {
+                        mediaType: 'video',
+                        videoType: file.type,
+                        description: pendingGalleryDescription,
+                        author: currentUserName,
+                        authorId: auth.currentUser?.uid || '',
+                        createdAt: serverTimestamp()
+                    }), 'No se pudo guardar el video. Revisa tu conexión e inténtalo de nuevo.');
+                } else {
+                    const url = await compressImage(file);
+                    await withTimeout(addDoc(galleryRef, {
+                        url,
+                        mediaType: 'image',
+                        description: pendingGalleryDescription,
+                        author: currentUserName,
+                        authorId: auth.currentUser?.uid || '',
+                        createdAt: serverTimestamp()
+                    }), 'La foto tardó demasiado en subir. Revisa tu conexión e inténtalo de nuevo.');
+                }
                 galleryForm.reset();
-                showNotification(`${currentUserName} compartió una foto 📸`, '📸');
-            } catch {
-                alert('No se pudo subir la foto, intenta con otra imagen.');
+                pendingGalleryDescription = '';
+                showNotification(`${currentUserName} compartió ${isVideo ? 'un video 🎬' : 'una foto 📸'}`, isVideo ? '🎬' : '📸', 'galleryGrid');
+            } catch (error) {
+                alert(error.message || `No se pudo subir ${isVideo ? 'el video' : 'la foto'}, intenta de nuevo.`);
             } finally {
+                pendingGalleryDescription = '';
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Subir foto';
+                submitBtn.textContent = 'Subir foto o video';
             }
         });
 
@@ -2748,56 +3174,74 @@
             return match ? `spotify:track:${match[1]}` : null;
         }
 
+        function youtubeUri(value) {
+            try {
+                const url = new URL(value.trim());
+                const videoId = url.hostname === 'youtu.be'
+                    ? url.pathname.split('/')[1]
+                    : url.searchParams.get('v') || url.pathname.match(/\/(?:embed|shorts)\/([^/?]+)/)?.[1];
+                return videoId && /^[A-Za-z0-9_-]{11}$/.test(videoId) ? `youtube:${videoId}` : null;
+            } catch {
+                return null;
+            }
+        }
+
+        async function deletePlaylistItem(id, data) {
+            if (data.source === 'mp3_file' && !data.uri) {
+                const chunks = await getDocs(collection(db, 'playlist', id, 'chunks'));
+                await Promise.all(chunks.docs.map((chunk) => deleteDoc(chunk.ref)));
+                playlistAudioCache.delete(id);
+            }
+            await deleteDoc(doc(db, 'playlist', id));
+        }
+
         function renderPlaylistItem(id, data) {
             const item = document.createElement('li');
             item.dataset.playlistId = id;
+            const currentUserId = auth.currentUser?.uid || '';
+            const isOwner = data.authorId === currentUserId;
             item.innerHTML = `
                 <span>🎵</span>
                 <div class="song-info"><strong></strong><span></span></div>
-                <button type="button" title="Eliminar canción">🗑️</button>
+                ${isOwner ? '<button type="button" title="Eliminar canción">🗑️</button>' : ''}
             `;
             item.querySelector('strong').textContent = data.title;
             item.querySelector('.song-info span').textContent = formatActivity(data.createdAt, data.author);
             item.addEventListener('click', (event) => {
                 if (event.target.closest('button')) return;
-                document.dispatchEvent(new CustomEvent('playlist:play', { detail: { uri: data.uri } }));
+                const uri = data.source === 'mp3_file' && !data.uri ? `mp3-file:${id}` : data.uri;
+                document.dispatchEvent(new CustomEvent('playlist:play', { detail: { uri } }));
             });
             item.style.cursor = 'pointer';
-            item.querySelector('button').addEventListener('click', () => deleteDoc(doc(db, 'playlist', id)));
+            const deleteBtn = item.querySelector('button');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', () => deletePlaylistItem(id, data));
+            }
             return item;
         }
 
-        // Optimización: Renderizado incremental de playlist
-        let playlistCachedIds = new Set();
-        
+        // Playlist: siempre renderizar la colección actual para no perder canciones previas.
         onSnapshot(playlistQuery, (snapshot) => {
-            const tracks = snapshot.docs.map((entry) => entry.data());
-            const newIds = new Set();
-            
+            const tracks = snapshot.docs.map((entry) => {
+                const data = entry.data();
+                return {
+                    title: data.title || 'Canción',
+                    uri: data.source === 'mp3_file' && !data.uri ? `mp3-file:${entry.id}` : data.uri || null
+                };
+            }).filter((track) => track.uri);
+
+            playlistList.innerHTML = '';
             snapshot.forEach((entry) => {
                 const data = entry.data();
                 const id = entry.id;
-                newIds.add(id);
-                
-                // Notificar si fue agregado por otra persona
+
                 if (data.authorId && data.authorId !== (auth.currentUser?.uid || '')) {
                     checkAndNotifyChanges('playlist', id, data, '🎵', '{author} agregó "{title}"');
                 }
-                
-                // Si es nuevo, agregarlo sin limpiar todo
-                if (!playlistCachedIds.has(id)) {
-                    playlistList.appendChild(renderPlaylistItem(id, data));
-                }
+
+                playlistList.appendChild(renderPlaylistItem(id, data));
             });
-            
-            // Eliminar items que ya no existen
-            playlistCachedIds.forEach(id => {
-                if (!newIds.has(id)) {
-                    document.querySelector(`li[data-playlist-id="${id}"]`)?.remove();
-                }
-            });
-            
-            playlistCachedIds = newIds;
+
             document.dispatchEvent(new CustomEvent('playlist:queue', { detail: { tracks } }));
         });
 
@@ -2805,67 +3249,94 @@
             event.preventDefault();
             const title = playlistTitle.value.trim();
             const source = document.querySelector('input[name="musicSource"]:checked').value;
+            const submitBtn = playlistForm.querySelector('button[type="submit"]');
+            const statusDiv = document.getElementById('playlistStatus');
+            
             let uri = null;
-            let audioUrl = null;
 
-            if (source === 'spotify') {
-                uri = spotifyUri(playlistUrl.value);
+            // Mostrar estado de carga
+            submitBtn.disabled = true;
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Agregando... ⏳';
+            if (statusDiv) statusDiv.innerHTML = '';
+
+            try {
+                if (source === 'spotify') {
+                    uri = spotifyUri(playlistUrl.value);
+                    if (!uri) {
+                        throw new Error('Pega un enlace válido de una canción de Spotify.');
+                    }
+                    playlistUrl.setCustomValidity('');
+                } else if (source === 'youtube') {
+                    uri = youtubeUri(document.getElementById('playlistYoutubeUrl').value);
+                    if (!uri) {
+                        throw new Error('Pega un enlace válido de un video de YouTube.');
+                    }
+                } else if (source === 'mp3') {
+                    const mp3File = document.getElementById('playlistMp3File').files[0];
+                    
+                    if (!mp3File) {
+                        throw new Error('Por favor sube un archivo MP3.');
+                    }
+
+                    if (mp3File.size > 8 * 1024 * 1024) {
+                        throw new Error('El archivo es demasiado grande. Usa uno de menos de 8 MB para que no se congele la carga.');
+                    }
+                    
+                    if (statusDiv) {
+                        statusDiv.innerHTML = '<div style="color: var(--muted); font-size: 0.9em;">📤 Preparando audio para guardarlo...</div>';
+                    }
+                    
+                    const base64Audio = await readFileAsDataUrl(mp3File);
+                    const audioRef = doc(playlistRef);
+                    const chunks = getBase64Chunks(base64Audio);
+                    await withTimeout(Promise.all(chunks.map((content, index) =>
+                        setDoc(doc(db, 'playlist', audioRef.id, 'chunks', String(index).padStart(4, '0')), { content })
+                    )), 'El MP3 tardó demasiado en subirse. Revisa tu conexión e inténtalo de nuevo.');
+                    await withTimeout(setDoc(audioRef, {
+                        title,
+                        source: 'mp3_file',
+                        audioType: mp3File.type || 'audio/mpeg',
+                        author: currentUserName,
+                        authorId: auth.currentUser?.uid || '',
+                        createdAt: serverTimestamp()
+                    }), 'El MP3 tardó demasiado en guardarse. Revisa tu conexión e inténtalo de nuevo.');
+
+                    playlistForm.reset();
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                    if (statusDiv) statusDiv.innerHTML = '<div style="color: #16a34a; font-size: 0.9em;">✅ Canción agregada exitosamente</div>';
+                    showNotification(`${currentUserName} agregó "${title}" 🎵`, '🎵', 'playlistList');
+                    return;
+                }
+
                 if (!uri) {
-                    playlistUrl.setCustomValidity('Pega un enlace válido de una canción de Spotify.');
-                    playlistUrl.reportValidity();
-                    return;
+                    throw new Error('URL inválida. Verifica el enlace.');
                 }
-                playlistUrl.setCustomValidity('');
-            } else if (source === 'youtube') {
-                const youtubeUrl = document.getElementById('playlistYoutubeUrl').value.trim();
-                if (!youtubeUrl) {
-                    alert('Por favor pega una URL de YouTube.');
-                    return;
-                }
-                // Generar URL de audio MP3 desde YouTube (usando yt-dlp o servicio externo)
-                audioUrl = youtubeUrl; // Este es un placeholder; idealmente usarías un servicio backend
-                uri = `mp3:${audioUrl}`;
-            } else if (source === 'mp3') {
-                const mp3File = document.getElementById('playlistMp3File').files[0];
-                const mp3Url = document.getElementById('playlistMp3Url').value.trim();
-                if (mp3File) {
-                    // Convertir archivo a base64
-                    const reader = new FileReader();
-                    reader.onload = async () => {
-                        const base64Audio = reader.result;
-                        await addDoc(playlistRef, {
-                            title,
-                            uri: `mp3:${base64Audio}`,
-                            source: 'mp3_file',
-                            author: currentUserName,
-                            createdAt: serverTimestamp()
-                        });
-                        playlistForm.reset();
-                        showNotification(`${currentUserName} agregó "${title}" 🎵`, '🎵');
-                    };
-                    reader.readAsDataURL(mp3File);
-                    return;
-                } else if (mp3Url) {
-                    uri = `mp3:${mp3Url}`;
-                } else {
-                    alert('Por favor proporciona una URL o sube un archivo MP3.');
-                    return;
-                }
-            }
 
-            if (!uri) {
-                alert('URL inválida. Verifica el enlace.');
-                return;
+                await withTimeout(addDoc(playlistRef, {
+                    title,
+                    uri,
+                    source,
+                    author: currentUserName,
+                    authorId: auth.currentUser?.uid || '',
+                    createdAt: serverTimestamp()
+                }), 'La canción tardó demasiado en guardarse. Revisa tu conexión e inténtalo de nuevo.');
+                
+                playlistForm.reset();
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+                if (statusDiv) statusDiv.innerHTML = '<div style="color: #16a34a; font-size: 0.9em;">✅ Canción agregada exitosamente</div>';
+                showNotification(`${currentUserName} agregó "${title}" 🎵`, '🎵', 'playlistList');
+                
+            } catch (error) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+                if (statusDiv) {
+                    statusDiv.innerHTML = `<div style="color: #dc2626; font-size: 0.9em;">❌ Error: ${error.message}</div>`;
+                }
+                showNotification(`Error: ${error.message}`, '⚠️', 'playlistList');
             }
-
-            await addDoc(playlistRef, {
-                title,
-                uri,
-                author: currentUserName,
-                createdAt: serverTimestamp()
-            });
-            playlistForm.reset();
-            showNotification(`${currentUserName} agregó "${title}" 🎵`, '🎵');
         });
 
         // Manejo de cambio de fuente de música
@@ -2878,7 +3349,6 @@
                 // Actualizar required
                 document.getElementById('playlistUrl').required = e.target.value === 'spotify';
                 document.getElementById('playlistYoutubeUrl').required = e.target.value === 'youtube';
-                document.getElementById('playlistMp3Url').required = false;
             });
         });
 
@@ -2892,18 +3362,22 @@
         function renderMessage(id, data) {
             const li = document.createElement('li');
             li.className = 'message-item';
+            const isOwner = data.authorId === (auth.currentUser?.uid || '');
             li.innerHTML = `
                 <strong></strong>
                 <p></p>
                 <small class="activity-meta"></small>
-                <button type="button" class="message-delete" title="Eliminar">🗑️</button>
+                ${isOwner ? '<button type="button" class="message-delete" title="Eliminar">🗑️</button>' : ''}
             `;
             li.querySelector('strong').textContent = data.author || 'Alguien especial';
             li.querySelector('p').textContent = data.text;
             li.querySelector('.activity-meta').textContent = formatActivity(data.createdAt, data.author);
-            li.querySelector('.message-delete').addEventListener('click', () => {
-                deleteDoc(doc(db, 'messages', id));
-            });
+            const deleteBtn = li.querySelector('.message-delete');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', () => {
+                    deleteDoc(doc(db, 'messages', id));
+                });
+            }
             return li;
         }
 
@@ -2930,7 +3404,7 @@
                 createdAt: serverTimestamp()
             });
             messageText.value = '';
-            showNotification(`${currentUserName} dejó un mensaje 💬`, '💬');
+            showNotification(`${currentUserName} dejó un mensaje 💬`, '💬', 'messagesList');
         });
 
         // Carta editable + reacciones (Firestore doc content/letter)
@@ -3002,16 +3476,20 @@ Te amo, Jhonn 🤍`;
         function renderNickname(id, data) {
             const div = document.createElement('div');
             div.className = 'nickname-card';
+            const isOwner = data.authorId === (auth.currentUser?.uid || '');
             div.innerHTML = `
                 <strong></strong>
                 <span></span>
                 <small class="activity-meta"></small>
-                <button type="button" class="nickname-delete" title="Eliminar">🗑️</button>
+                ${isOwner ? '<button type="button" class="nickname-delete" title="Eliminar">🗑️</button>' : ''}
             `;
             div.querySelector('strong').textContent = data.title;
             div.querySelector('span').textContent = data.desc;
             div.querySelector('.activity-meta').textContent = formatActivity(data.createdAt, data.author);
-            div.querySelector('.nickname-delete').addEventListener('click', () => deleteDoc(doc(db, 'nicknames', id)));
+            const deleteBtn = div.querySelector('.nickname-delete');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', () => deleteDoc(doc(db, 'nicknames', id)));
+            }
             return div;
         }
 
@@ -3024,7 +3502,9 @@ Te amo, Jhonn 🤍`;
                 nicknameGrid.appendChild(seed);
             }
             snapshot.forEach((docSnap) => {
-                nicknameGrid.appendChild(renderNickname(docSnap.id, docSnap.data()));
+                const data = docSnap.data();
+                checkAndNotifyChanges('nicknames', docSnap.id, data, '💞', '{author} agregó un apodo', 'nicknameGrid');
+                nicknameGrid.appendChild(renderNickname(docSnap.id, data));
             });
         });
 
@@ -3046,44 +3526,92 @@ Te amo, Jhonn 🤍`;
         // Espacios compartidos, iniciados después de identificar la cuenta.
         let sharedWorldReady = false;
 
-        function showNotification(message, icon = '✨') {
+        function showNotification(message, icon = '✨', scrollTarget = null) {
             const container = document.getElementById('notificationsContainer');
+            const floatingContainer = document.getElementById('floatingNotifications');
+            
+            // Notificación fija en la esquina
             const notification = document.createElement('div');
             notification.className = 'notification';
-            notification.innerHTML = `<span style="font-size: 1.2em; margin-right: 8px; display: inline-block;">${icon}</span> ${message}`;
+            notification.innerHTML = `
+                <span style="font-size: 1.2em; margin-right: 8px; display: inline-block;">${icon}</span>
+                <span>${message}</span>
+                <button type="button" style="margin-left: 10px; padding: 2px 6px; font-size: 0.8em; cursor: pointer; background: rgba(255,255,255,0.2); border: none; border-radius: 4px; color: inherit;">✕</button>
+            `;
 
             container.appendChild(notification);
 
-            // Auto-cerrar después de 4 segundos
-            const timeout = setTimeout(() => {
+            // Cerrar al hacer clic en el botón X
+            const closeBtn = notification.querySelector('button');
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 notification.classList.add('removing');
                 setTimeout(() => notification.remove(), 300);
-            }, 4000);
+                if (floatingBtn) {
+                    floatingBtn.classList.add('removing');
+                    setTimeout(() => floatingBtn.remove(), 300);
+                }
+            });
 
-            // Permitir cerrar al hacer clic
-            notification.addEventListener('click', () => {
-                clearTimeout(timeout);
+            // Ícono flotante clickeable
+            const floatingBtn = document.createElement('button');
+            floatingBtn.className = 'floating-notification';
+            floatingBtn.innerHTML = icon;
+            floatingBtn.title = message;
+            
+            floatingContainer.appendChild(floatingBtn);
+
+            // Mapping de emojis a secciones
+            const sectionMap = {
+                '📸': 'galleryGrid',
+                '🎵': 'playlistList',  // Playlist
+                '💬': 'messagesList',  // Messages
+                '✨': 'momentsList',   // Moments
+                '📅': 'plansList',     // Plans
+            };
+
+            // Obtener el target de scroll
+            let targetSection = scrollTarget || sectionMap[icon];
+
+            floatingBtn.addEventListener('click', () => {
+                if (targetSection) {
+                    const element = document.getElementById(targetSection);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        // Destacar la sección
+                        element.parentElement?.classList?.add('highlight');
+                        setTimeout(() => {
+                            element.parentElement?.classList?.remove('highlight');
+                        }, 2000);
+                    }
+                }
+                // Cerrar notificación y botón flotante
                 notification.classList.add('removing');
-                setTimeout(() => notification.remove(), 300);
+                floatingBtn.classList.add('removing');
+                setTimeout(() => {
+                    notification.remove();
+                    floatingBtn.remove();
+                }, 300);
             });
         }
 
         // Store para rastrear últimos documentos (evita notificaciones duplicadas)
         let lastDocTimestamps = {};
 
-        function checkAndNotifyChanges(collectionName, docId, data, icon, messageTemplate) {
+        function checkAndNotifyChanges(collectionName, docId, data, icon, messageTemplate, scrollTarget = null) {
             if (!data || !data.authorId || data.authorId === (auth.currentUser?.uid || '')) {
                 return; // Ignore own changes
             }
             const key = `${collectionName}_${docId}`;
             const lastTime = lastDocTimestamps[key];
-            if (lastTime && (data.createdAt?.getTime?.() || 0) <= lastTime) {
+            const changeTime = data.updatedAt?.toMillis?.() || data.sentAt?.toMillis?.() || data.createdAt?.toMillis?.() || 0;
+            if (lastTime && changeTime <= lastTime) {
                 return; // Already notified
             }
-            lastDocTimestamps[key] = data.createdAt?.getTime?.() || Date.now();
+            lastDocTimestamps[key] = changeTime || Date.now();
             const author = data.author || 'Alguien especial';
             const message = messageTemplate.replace('{author}', author).replace('{title}', data.title || '');
-            showNotification(message, icon);
+            showNotification(message, icon, scrollTarget);
         }
 
         function createListItem(text, meta) {
@@ -3111,9 +3639,9 @@ Te amo, Jhonn 🤍`;
                 const input = document.getElementById('momentText');
                 const text = input.value.trim();
                 if (!text) return;
-                await addDoc(momentsRef, { text, author: currentUserName, createdAt: serverTimestamp() });
+                await addDoc(momentsRef, { text, author: currentUserName, authorId: auth.currentUser?.uid || '', createdAt: serverTimestamp() });
                 input.value = '';
-                showNotification(`${currentUserName} compartió un momento ✨`, '✨');
+                showNotification(`${currentUserName} compartió un momento ✨`, '✨', 'momentsList');
             });
             onSnapshot(query(momentsRef, orderBy('createdAt', 'desc')), (snapshot) => {
                 momentsList.innerHTML = '';
@@ -3134,9 +3662,9 @@ Te amo, Jhonn 🤍`;
                 const text = document.getElementById('planText').value.trim();
                 const date = document.getElementById('planDate').value;
                 if (!text || !date) return;
-                await addDoc(plansRef, { text, date, done: false, author: currentUserName, createdAt: serverTimestamp() });
+                await addDoc(plansRef, { text, date, done: false, author: currentUserName, authorId: auth.currentUser?.uid || '', createdAt: serverTimestamp() });
                 event.target.reset();
-                showNotification(`${currentUserName} propuso un plan 📅`, '📅');
+                showNotification(`${currentUserName} propuso un plan 📅`, '📅', 'plansList');
             });
             onSnapshot(query(plansRef, orderBy('date', 'asc')), (snapshot) => {
                 plansList.innerHTML = '';
@@ -3206,11 +3734,15 @@ Te amo, Jhonn 🤍`;
                 const input = document.getElementById('memoryText');
                 const text = input.value.trim();
                 if (!text) return;
-                await addDoc(memoriesRef, { text, author: currentUserName, createdAt: serverTimestamp() });
+                await addDoc(memoriesRef, { text, author: currentUserName, authorId: auth.currentUser?.uid || '', createdAt: serverTimestamp() });
                 input.value = '';
             });
             onSnapshot(memoriesRef, (snapshot) => {
-                memories = snapshot.docs.map((entry) => entry.data());
+                memories = snapshot.docs.map((entry) => {
+                    const data = entry.data();
+                    checkAndNotifyChanges('memories', entry.id, data, '📝', '{author} guardó un recuerdo', 'drawnMemory');
+                    return data;
+                });
             });
             document.getElementById('drawMemoryBtn').addEventListener('click', () => {
                 document.getElementById('drawnMemory').textContent = memories.length
@@ -3252,13 +3784,14 @@ Te amo, Jhonn 🤍`;
                 const name = document.getElementById('placeName').value.trim();
                 const note = document.getElementById('placeNote').value.trim();
                 if (!name || !note) return;
-                await addDoc(placesRef, { name, note, author: currentUserName, createdAt: serverTimestamp() });
+                await addDoc(placesRef, { name, note, author: currentUserName, authorId: auth.currentUser?.uid || '', createdAt: serverTimestamp() });
                 event.target.reset();
             });
             onSnapshot(query(placesRef, orderBy('createdAt', 'desc')), (snapshot) => {
                 placesList.innerHTML = '';
                 snapshot.forEach((entry) => {
                     const data = entry.data();
+                    checkAndNotifyChanges('places', entry.id, data, '📍', '{author} agregó un lugar', 'placesList');
                     placesList.appendChild(createListItem(`${data.name}: ${data.note}`, formatActivity(data.createdAt, data.author)));
                 });
             });
@@ -3270,13 +3803,14 @@ Te amo, Jhonn 🤍`;
                 const text = document.getElementById('capsuleText').value.trim();
                 const unlockDate = document.getElementById('capsuleDate').value;
                 if (!text || !unlockDate) return;
-                await addDoc(capsulesRef, { text, unlockDate, author: currentUserName, createdAt: serverTimestamp() });
+                await addDoc(capsulesRef, { text, unlockDate, author: currentUserName, authorId: auth.currentUser?.uid || '', createdAt: serverTimestamp() });
                 event.target.reset();
             });
             onSnapshot(query(capsulesRef, orderBy('unlockDate', 'asc')), (snapshot) => {
                 capsulesList.innerHTML = '';
                 snapshot.forEach((entry) => {
                     const data = entry.data();
+                    checkAndNotifyChanges('capsules', entry.id, data, '🔒', '{author} guardó una cápsula', 'capsulesList');
                     const open = data.unlockDate <= dayKey;
                     capsulesList.appendChild(createListItem(open ? `💌 ${data.text}` : `🔒 Se abre el ${data.unlockDate}`, `De ${data.author || 'alguien especial'}`));
                 });
@@ -3289,13 +3823,14 @@ Te amo, Jhonn 🤍`;
                 const input = document.getElementById('coupleQuestionText');
                 const text = input.value.trim();
                 if (!text) return;
-                await addDoc(coupleQuestionsRef, { text, author: currentUserName, createdAt: serverTimestamp() });
+                await addDoc(coupleQuestionsRef, { text, author: currentUserName, authorId: auth.currentUser?.uid || '', createdAt: serverTimestamp() });
                 input.value = '';
             });
             onSnapshot(query(coupleQuestionsRef, orderBy('createdAt', 'desc')), (snapshot) => {
                 coupleQuestionsList.innerHTML = '';
                 snapshot.forEach((entry) => {
                     const data = entry.data();
+                    checkAndNotifyChanges('coupleQuestions', entry.id, data, '❓', '{author} dejó una pregunta', 'coupleQuestionsList');
                     const item = createListItem(data.text, `Pregunta de ${data.author || 'alguien especial'}`);
                     const answers = data.answers || {};
                     const answerBox = document.createElement('div');
@@ -3331,6 +3866,129 @@ Te amo, Jhonn 🤍`;
                     coupleQuestionsList.appendChild(item);
                 });
             });
+
+            const quizQuestionsRef = collection(db, 'quizQuestions');
+            const quizQuestionForm = document.getElementById('quizQuestionForm');
+            const quizQuestionsList = document.getElementById('quizQuestionsList');
+            const quizScores = document.getElementById('quizScores');
+            const quizRandomBtn = document.getElementById('quizRandomBtn');
+
+            quizRandomBtn.addEventListener('click', () => {
+                const pendingQuestions = [...quizQuestionsList.querySelectorAll('[data-quiz-pending="true"]')];
+                if (!pendingQuestions.length) {
+                    alert('No tienes preguntas pendientes por responder.');
+                    return;
+                }
+                pendingQuestions[Math.floor(Math.random() * pendingQuestions.length)]
+                    .scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+
+            quizQuestionForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const question = document.getElementById('quizQuestionText').value.trim();
+                const correctAnswer = document.getElementById('quizCorrectAnswer').value.trim();
+                const wrongAnswers = [
+                    document.getElementById('quizWrongAnswerOne').value.trim(),
+                    document.getElementById('quizWrongAnswerTwo').value.trim(),
+                    document.getElementById('quizWrongAnswerThree').value.trim()
+                ];
+                const options = [correctAnswer, ...wrongAnswers];
+                const uniqueOptions = new Set(options.map((option) => option.toLocaleLowerCase()));
+                if (!question || options.some((option) => !option) || uniqueOptions.size !== 4) {
+                    alert('Escribe una pregunta y cuatro respuestas distintas.');
+                    return;
+                }
+                await addDoc(quizQuestionsRef, {
+                    question,
+                    options: options.sort(() => Math.random() - 0.5),
+                    correctAnswer,
+                    answers: {},
+                    author: currentUserName,
+                    authorId: auth.currentUser?.uid || '',
+                    createdAt: serverTimestamp()
+                });
+                quizQuestionForm.reset();
+            });
+
+            let quizReady = false;
+            onSnapshot(query(quizQuestionsRef, orderBy('createdAt', 'desc')), (snapshot) => {
+                const currentUserId = auth.currentUser?.uid || '';
+                const scores = {};
+                quizQuestionsList.innerHTML = '';
+
+                snapshot.docChanges().forEach((change) => {
+                    const data = change.doc.data();
+                    if (!quizReady || data.authorId === currentUserId) return;
+                    if (change.type === 'added') {
+                        showNotification(`${data.author || 'La otra persona'} agregó una pregunta ❓`, '❓', 'quizQuestionsList');
+                    } else if (change.type === 'modified' && data.lastAnswerById && data.lastAnswerById !== currentUserId) {
+                        showNotification(`${data.lastAnswerBy || 'La otra persona'} respondió una pregunta ❓`, '❓', 'quizQuestionsList');
+                    }
+                });
+
+                snapshot.forEach((entry) => {
+                    const data = entry.data();
+                    const answers = data.answers || {};
+                    Object.values(answers).forEach((answer) => {
+                        if (!scores[answer.name]) scores[answer.name] = { correct: 0, total: 0 };
+                        scores[answer.name].total++;
+                        if (answer.correct) scores[answer.name].correct++;
+                    });
+
+                    const card = document.createElement('div');
+                    card.className = 'quiz-question';
+                    const ownQuestion = data.authorId === currentUserId;
+                    const ownAnswer = answers[currentUserId];
+                    card.dataset.quizPending = String(!ownQuestion && !ownAnswer);
+                    const title = document.createElement('p');
+                    title.textContent = data.question;
+                    card.appendChild(title);
+
+                    const meta = document.createElement('small');
+                    meta.className = 'activity-meta';
+                    meta.textContent = ownQuestion ? 'Tu pregunta: espera la respuesta de la otra persona.' : `Pregunta de ${data.author || 'alguien especial'}`;
+                    card.appendChild(meta);
+
+                    if (!ownQuestion) {
+                        const options = document.createElement('div');
+                        options.className = 'quiz-options';
+                        (data.options || []).forEach((option) => {
+                            const button = document.createElement('button');
+                            button.type = 'button';
+                            button.className = 'quiz-option';
+                            button.textContent = option;
+                            if (ownAnswer) {
+                                button.disabled = true;
+                                if (option === data.correctAnswer) button.classList.add('correct');
+                                if (option === ownAnswer.answer && !ownAnswer.correct) button.classList.add('wrong');
+                            } else {
+                                button.addEventListener('click', async () => {
+                                    const correct = option === data.correctAnswer;
+                                    await updateDoc(doc(db, 'quizQuestions', entry.id), {
+                                        [`answers.${currentUserId}`]: { name: currentUserName, answer: option, correct },
+                                        lastAnswerBy: currentUserName,
+                                        lastAnswerById: currentUserId,
+                                        updatedAt: serverTimestamp()
+                                    });
+                                });
+                            }
+                            options.appendChild(button);
+                        });
+                        card.appendChild(options);
+                        if (ownAnswer) {
+                            const result = document.createElement('p');
+                            result.className = 'quiz-result show';
+                            result.textContent = ownAnswer.correct ? '¡Correcto! La conoces muy bien.' : `Casi. La respuesta era: ${data.correctAnswer}`;
+                            card.appendChild(result);
+                        }
+                    }
+                    quizQuestionsList.appendChild(card);
+                });
+
+                const scoreText = Object.entries(scores).map(([name, score]) => `${name}: ${score.correct}/${score.total}`).join(' · ');
+                quizScores.textContent = scoreText || 'Aún no hay respuestas. Crea la primera pregunta.';
+                quizReady = true;
+            });
         }
 
         document.addEventListener('private:authenticated', initSharedWorld);
@@ -3342,6 +4000,8 @@ Te amo, Jhonn 🤍`;
         const presenceRef = collection(db, 'presence');
         let presenceDocRef = null;
         let presenceHeartbeat = null;
+        let otherLastActive = null;
+        let otherIsOnline = false;
 
         function otherPerson() {
             return currentUserName === 'Sol' ? 'Jhonn' : 'Sol';
@@ -3354,6 +4014,27 @@ Te amo, Jhonn 🤍`;
                 online: isOnline,
                 lastActive: serverTimestamp()
             }, { merge: true });
+        }
+
+        function formatLastSeen(lastActive) {
+            const seconds = Math.max(0, Math.floor((Date.now() - lastActive.getTime()) / 1000));
+            if (seconds < 60) return 'hace unos segundos';
+            if (seconds < 3600) return `hace ${Math.floor(seconds / 60)} min`;
+            if (seconds < 86400) return `hoy a las ${lastActive.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
+            return lastActive.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+        }
+
+        function renderPresenceStatus() {
+            const other = otherPerson();
+            if (otherIsOnline) {
+                onlineStatusEl.textContent = `● ${other} está en línea`;
+                onlineStatusEl.classList.add('online');
+                return;
+            }
+            onlineStatusEl.textContent = otherLastActive
+                ? `${other} estuvo en línea ${formatLastSeen(otherLastActive)}`
+                : `${other} aún no ha entrado`;
+            onlineStatusEl.classList.remove('online');
         }
 
         onSnapshot(visitsDocRef, (docSnap) => {
@@ -3369,10 +4050,12 @@ Te amo, Jhonn 🤍`;
             const lastActive = otherPresence?.lastActive?.toDate?.() || null;
             // Reducido de 90s a 45s para detección más rápida en tiempo real
             const recentlyActive = lastActive && (Date.now() - lastActive.getTime() < 45000);
-            const isOnline = otherPresence?.online && recentlyActive;
-            onlineStatusEl.textContent = isOnline ? `● ${other} está en línea ✨` : `${other} offline`;
-            onlineStatusEl.classList.toggle('online', Boolean(isOnline));
+            otherLastActive = lastActive;
+            otherIsOnline = Boolean(otherPresence?.online && recentlyActive);
+            renderPresenceStatus();
         });
+
+        setInterval(renderPresenceStatus, 30000);
 
         document.addEventListener('private:unlocked', () => {
             const userId = auth.currentUser?.uid;
