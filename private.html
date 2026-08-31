@@ -597,6 +597,57 @@
             color: var(--muted);
         }
 
+        /* Notificaciones */
+        .notifications-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 320px;
+            pointer-events: none;
+        }
+
+        .notification {
+            padding: 14px 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            color: var(--text);
+            font-size: 0.95rem;
+            pointer-events: auto;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .notification.removing {
+            animation: slideOut 0.3s ease-out forwards;
+        }
+
         .playlist-list button {
             flex-shrink: 0;
             border: none;
@@ -615,6 +666,21 @@
             grid-template-columns: 1fr;
             gap: 10px;
             margin-top: 16px;
+        }
+
+        .playlist-add-row input[type="radio"] {
+            cursor: pointer;
+            accent-color: #ec4899;
+        }
+
+        .playlist-add-row input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-soft);
+            color: var(--text);
+            font-size: 0.9rem;
         }
 
         .playlist-add-row input {
@@ -976,6 +1042,17 @@
             75% { transform: scale(1.1); }
         }
 
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         /* Música de Fondo */
         .music-player {
             position: fixed;
@@ -1263,11 +1340,13 @@
             margin-top: 6px;
             color: var(--muted);
             font-size: 0.85rem;
+            transition: color 0.3s ease, opacity 0.3s ease;
         }
 
         .online-status.online {
             color: #16a34a;
             font-weight: 700;
+            text-shadow: 0 0 10px rgba(22, 163, 74, 0.5);
         }
 
         /* Fechas especiales */
@@ -1736,8 +1815,32 @@
                         <p style="text-align: center; color: var(--muted);">Canciones que nos recuerdan a nosotros</p>
                         <ul class="playlist-list" id="playlistList"></ul>
                         <form class="playlist-add-row" id="playlistAddForm">
+                            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                                <label style="flex: 1; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                    <input type="radio" name="musicSource" value="spotify" checked /> Spotify
+                                </label>
+                                <label style="flex: 1; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                    <input type="radio" name="musicSource" value="youtube" /> YouTube
+                                </label>
+                                <label style="flex: 1; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                    <input type="radio" name="musicSource" value="mp3" /> MP3
+                                </label>
+                            </div>
                             <input id="playlistTitle" type="text" maxlength="80" placeholder="Nombre de la canción y artista" required />
-                            <input id="playlistUrl" type="url" placeholder="Enlace de Spotify" required />
+                            
+                            <div id="spotifyInputField">
+                                <input id="playlistUrl" type="url" placeholder="Enlace de Spotify" required />
+                            </div>
+                            <div id="youtubeInputField" style="display: none;">
+                                <input id="playlistYoutubeUrl" type="url" placeholder="URL de YouTube (se extraerá el audio)" />
+                                <small style="color: var(--muted); display: block; margin-top: 4px;">Nota: Se usará un servicio para convertir el audio</small>
+                            </div>
+                            <div id="mp3InputField" style="display: none;">
+                                <input id="playlistMp3Url" type="url" placeholder="URL directa del archivo MP3" />
+                                <small style="color: var(--muted); display: block; margin-top: 4px;">O sube un archivo:
+                                <input type="file" id="playlistMp3File" accept="audio/mp3" style="margin-top: 4px;" /></small>
+                            </div>
+                            
                             <button type="submit">Agregar canción</button>
                         </form>
                     </div>
@@ -1921,6 +2024,8 @@
             </section>
         </main>
 
+        <div class="notifications-container" id="notificationsContainer"></div>
+
         <footer class="site-footer">
             <div class="container footer-row">
                 <p>© 2026 Jhonn. Contenido Privado 🔒</p>
@@ -1954,6 +2059,7 @@
                 <div id="spotifyQueue"></div>
             </div>
             <div id="spotifyEmbedContainer" class="spotify-embed-hidden"></div>
+            <audio id="audioPlayer" style="display: none;"></audio>
         </div>
         <canvas id="confettiCanvas"></canvas>
     </div>
@@ -2525,8 +2631,10 @@
 
         function renderGalleryItem(id, data) {
             const div = document.createElement('div');
+            div.id = `gallery-${id}`;
             div.className = 'gallery-item';
             div.dataset.url = data.url;
+            div.style.animation = 'slideInUp 0.3s ease-out';
             const dateLabel = data.createdAt?.toDate
                 ? data.createdAt.toDate().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
                 : '';
@@ -2552,11 +2660,54 @@
             return div;
         }
 
+        // Optimización: Renderizado incremental (solo agregar nuevos, no reconstruir todo)
+        let galleryCachedIds = new Set();
+        
         onSnapshot(galleryQuery, (snapshot) => {
-            galleryGrid.innerHTML = '';
+            const newIds = new Set();
+            
             snapshot.forEach((docSnap) => {
-                galleryGrid.appendChild(renderGalleryItem(docSnap.id, docSnap.data()));
+                const data = docSnap.data();
+                const id = docSnap.id;
+                newIds.add(id);
+                
+                // Notificar si fue agregado por otra persona
+                if (data.authorId && data.authorId !== (auth.currentUser?.uid || '')) {
+                    checkAndNotifyChanges('gallery', id, data, '📸', '{author} compartió una foto');
+                }
+                
+                // Si es nuevo, agregarlo sin limpiar todo
+                if (!galleryCachedIds.has(id)) {
+                    galleryGrid.insertAdjacentElement('afterbegin', renderGalleryItem(id, data));
+                } else {
+                    // Si existe, actualizar reacciones sin perder estado
+                    const existing = document.getElementById(`gallery-${id}`);
+                    if (existing) {
+                        const dateLabel = data.createdAt?.toDate
+                            ? data.createdAt.toDate().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
+                            : '';
+                        existing.querySelector('.gallery-reactions').innerHTML = `
+                            <button type="button" class="gallery-reaction" data-reaction="likes">👍 ${data.likes || 0}</button>
+                            <button type="button" class="gallery-reaction" data-reaction="loves">❤️ ${data.loves || 0}</button>
+                        `;
+                        existing.querySelectorAll('.gallery-reaction').forEach((button) => {
+                            button.addEventListener('click', async (e) => {
+                                e.stopPropagation();
+                                await updateDoc(doc(db, 'gallery', id), { [button.dataset.reaction]: increment(1) });
+                            });
+                        });
+                    }
+                }
             });
+            
+            // Eliminar items que ya no existen
+            galleryCachedIds.forEach(id => {
+                if (!newIds.has(id)) {
+                    document.getElementById(`gallery-${id}`)?.remove();
+                }
+            });
+            
+            galleryCachedIds = newIds;
         });
 
         galleryForm.addEventListener('submit', async (e) => {
@@ -2575,6 +2726,7 @@
                     createdAt: serverTimestamp()
                 });
                 galleryForm.reset();
+                showNotification(`${currentUserName} compartió una foto 📸`, '📸');
             } catch {
                 alert('No se pudo subir la foto, intenta con otra imagen.');
             } finally {
@@ -2598,6 +2750,7 @@
 
         function renderPlaylistItem(id, data) {
             const item = document.createElement('li');
+            item.dataset.playlistId = id;
             item.innerHTML = `
                 <span>🎵</span>
                 <div class="song-info"><strong></strong><span></span></div>
@@ -2614,23 +2767,97 @@
             return item;
         }
 
+        // Optimización: Renderizado incremental de playlist
+        let playlistCachedIds = new Set();
+        
         onSnapshot(playlistQuery, (snapshot) => {
-            playlistList.innerHTML = '';
             const tracks = snapshot.docs.map((entry) => entry.data());
-            snapshot.forEach((entry) => playlistList.appendChild(renderPlaylistItem(entry.id, entry.data())));
+            const newIds = new Set();
+            
+            snapshot.forEach((entry) => {
+                const data = entry.data();
+                const id = entry.id;
+                newIds.add(id);
+                
+                // Notificar si fue agregado por otra persona
+                if (data.authorId && data.authorId !== (auth.currentUser?.uid || '')) {
+                    checkAndNotifyChanges('playlist', id, data, '🎵', '{author} agregó "{title}"');
+                }
+                
+                // Si es nuevo, agregarlo sin limpiar todo
+                if (!playlistCachedIds.has(id)) {
+                    playlistList.appendChild(renderPlaylistItem(id, data));
+                }
+            });
+            
+            // Eliminar items que ya no existen
+            playlistCachedIds.forEach(id => {
+                if (!newIds.has(id)) {
+                    document.querySelector(`li[data-playlist-id="${id}"]`)?.remove();
+                }
+            });
+            
+            playlistCachedIds = newIds;
             document.dispatchEvent(new CustomEvent('playlist:queue', { detail: { tracks } }));
         });
 
         playlistForm.addEventListener('submit', async (event) => {
             event.preventDefault();
             const title = playlistTitle.value.trim();
-            const uri = spotifyUri(playlistUrl.value);
+            const source = document.querySelector('input[name="musicSource"]:checked').value;
+            let uri = null;
+            let audioUrl = null;
+
+            if (source === 'spotify') {
+                uri = spotifyUri(playlistUrl.value);
+                if (!uri) {
+                    playlistUrl.setCustomValidity('Pega un enlace válido de una canción de Spotify.');
+                    playlistUrl.reportValidity();
+                    return;
+                }
+                playlistUrl.setCustomValidity('');
+            } else if (source === 'youtube') {
+                const youtubeUrl = document.getElementById('playlistYoutubeUrl').value.trim();
+                if (!youtubeUrl) {
+                    alert('Por favor pega una URL de YouTube.');
+                    return;
+                }
+                // Generar URL de audio MP3 desde YouTube (usando yt-dlp o servicio externo)
+                audioUrl = youtubeUrl; // Este es un placeholder; idealmente usarías un servicio backend
+                uri = `mp3:${audioUrl}`;
+            } else if (source === 'mp3') {
+                const mp3File = document.getElementById('playlistMp3File').files[0];
+                const mp3Url = document.getElementById('playlistMp3Url').value.trim();
+                if (mp3File) {
+                    // Convertir archivo a base64
+                    const reader = new FileReader();
+                    reader.onload = async () => {
+                        const base64Audio = reader.result;
+                        await addDoc(playlistRef, {
+                            title,
+                            uri: `mp3:${base64Audio}`,
+                            source: 'mp3_file',
+                            author: currentUserName,
+                            createdAt: serverTimestamp()
+                        });
+                        playlistForm.reset();
+                        showNotification(`${currentUserName} agregó "${title}" 🎵`, '🎵');
+                    };
+                    reader.readAsDataURL(mp3File);
+                    return;
+                } else if (mp3Url) {
+                    uri = `mp3:${mp3Url}`;
+                } else {
+                    alert('Por favor proporciona una URL o sube un archivo MP3.');
+                    return;
+                }
+            }
+
             if (!uri) {
-                playlistUrl.setCustomValidity('Pega un enlace válido de una canción de Spotify.');
-                playlistUrl.reportValidity();
+                alert('URL inválida. Verifica el enlace.');
                 return;
             }
-            playlistUrl.setCustomValidity('');
+
             await addDoc(playlistRef, {
                 title,
                 uri,
@@ -2638,6 +2865,21 @@
                 createdAt: serverTimestamp()
             });
             playlistForm.reset();
+            showNotification(`${currentUserName} agregó "${title}" 🎵`, '🎵');
+        });
+
+        // Manejo de cambio de fuente de música
+        document.querySelectorAll('input[name="musicSource"]').forEach((radio) => {
+            radio.addEventListener('change', (e) => {
+                document.getElementById('spotifyInputField').style.display = e.target.value === 'spotify' ? 'block' : 'none';
+                document.getElementById('youtubeInputField').style.display = e.target.value === 'youtube' ? 'block' : 'none';
+                document.getElementById('mp3InputField').style.display = e.target.value === 'mp3' ? 'block' : 'none';
+                
+                // Actualizar required
+                document.getElementById('playlistUrl').required = e.target.value === 'spotify';
+                document.getElementById('playlistYoutubeUrl').required = e.target.value === 'youtube';
+                document.getElementById('playlistMp3Url').required = false;
+            });
         });
 
         // Notas / mensajes entre ambos
@@ -2668,7 +2910,12 @@
         onSnapshot(messagesQuery, (snapshot) => {
             messagesList.innerHTML = '';
             snapshot.forEach((docSnap) => {
-                messagesList.appendChild(renderMessage(docSnap.id, docSnap.data()));
+                const data = docSnap.data();
+                // Notificar si fue agregado por otra persona
+                if (data.authorId && data.authorId !== (auth.currentUser?.uid || '')) {
+                    checkAndNotifyChanges('messages', docSnap.id, data, '💬', '{author} dejó un mensaje');
+                }
+                messagesList.appendChild(renderMessage(docSnap.id, data));
             });
         });
 
@@ -2683,6 +2930,7 @@
                 createdAt: serverTimestamp()
             });
             messageText.value = '';
+            showNotification(`${currentUserName} dejó un mensaje 💬`, '💬');
         });
 
         // Carta editable + reacciones (Firestore doc content/letter)
@@ -2798,6 +3046,46 @@ Te amo, Jhonn 🤍`;
         // Espacios compartidos, iniciados después de identificar la cuenta.
         let sharedWorldReady = false;
 
+        function showNotification(message, icon = '✨') {
+            const container = document.getElementById('notificationsContainer');
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `<span style="font-size: 1.2em; margin-right: 8px; display: inline-block;">${icon}</span> ${message}`;
+
+            container.appendChild(notification);
+
+            // Auto-cerrar después de 4 segundos
+            const timeout = setTimeout(() => {
+                notification.classList.add('removing');
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+
+            // Permitir cerrar al hacer clic
+            notification.addEventListener('click', () => {
+                clearTimeout(timeout);
+                notification.classList.add('removing');
+                setTimeout(() => notification.remove(), 300);
+            });
+        }
+
+        // Store para rastrear últimos documentos (evita notificaciones duplicadas)
+        let lastDocTimestamps = {};
+
+        function checkAndNotifyChanges(collectionName, docId, data, icon, messageTemplate) {
+            if (!data || !data.authorId || data.authorId === (auth.currentUser?.uid || '')) {
+                return; // Ignore own changes
+            }
+            const key = `${collectionName}_${docId}`;
+            const lastTime = lastDocTimestamps[key];
+            if (lastTime && (data.createdAt?.getTime?.() || 0) <= lastTime) {
+                return; // Already notified
+            }
+            lastDocTimestamps[key] = data.createdAt?.getTime?.() || Date.now();
+            const author = data.author || 'Alguien especial';
+            const message = messageTemplate.replace('{author}', author).replace('{title}', data.title || '');
+            showNotification(message, icon);
+        }
+
         function createListItem(text, meta) {
             const item = document.createElement('li');
             const body = document.createElement('div');
@@ -2825,11 +3113,16 @@ Te amo, Jhonn 🤍`;
                 if (!text) return;
                 await addDoc(momentsRef, { text, author: currentUserName, createdAt: serverTimestamp() });
                 input.value = '';
+                showNotification(`${currentUserName} compartió un momento ✨`, '✨');
             });
             onSnapshot(query(momentsRef, orderBy('createdAt', 'desc')), (snapshot) => {
                 momentsList.innerHTML = '';
                 snapshot.forEach((entry) => {
                     const data = entry.data();
+                    // Notificar si fue agregado por otra persona
+                    if (data.authorId && data.authorId !== (auth.currentUser?.uid || '')) {
+                        checkAndNotifyChanges('moments', entry.id, data, '✨', '{author} compartió un momento');
+                    }
                     momentsList.appendChild(createListItem(data.text, formatActivity(data.createdAt, data.author)));
                 });
             });
@@ -2843,11 +3136,16 @@ Te amo, Jhonn 🤍`;
                 if (!text || !date) return;
                 await addDoc(plansRef, { text, date, done: false, author: currentUserName, createdAt: serverTimestamp() });
                 event.target.reset();
+                showNotification(`${currentUserName} propuso un plan 📅`, '📅');
             });
             onSnapshot(query(plansRef, orderBy('date', 'asc')), (snapshot) => {
                 plansList.innerHTML = '';
                 snapshot.forEach((entry) => {
                     const data = entry.data();
+                    // Notificar si fue agregado por otra persona
+                    if (data.authorId && data.authorId !== (auth.currentUser?.uid || '')) {
+                        checkAndNotifyChanges('plans', entry.id, data, '📅', '{author} propuso un plan');
+                    }
                     const item = createListItem(`${data.done ? '✓ ' : ''}${data.date} · ${data.text}`, `Propuesto por ${data.author || 'alguien especial'}`);
                     item.style.cursor = 'pointer';
                     item.addEventListener('click', () => updateDoc(doc(db, 'plans', entry.id), { done: !data.done }));
@@ -3069,9 +3367,10 @@ Te amo, Jhonn 🤍`;
             const other = otherPerson();
             const otherPresence = snapshot.docs.find((entry) => entry.data().name === other)?.data();
             const lastActive = otherPresence?.lastActive?.toDate?.() || null;
-            const recentlyActive = lastActive && (Date.now() - lastActive.getTime() < 90000);
+            // Reducido de 90s a 45s para detección más rápida en tiempo real
+            const recentlyActive = lastActive && (Date.now() - lastActive.getTime() < 45000);
             const isOnline = otherPresence?.online && recentlyActive;
-            onlineStatusEl.textContent = isOnline ? `● ${other} está en línea` : `${other} no está en línea`;
+            onlineStatusEl.textContent = isOnline ? `● ${other} está en línea ✨` : `${other} offline`;
             onlineStatusEl.classList.toggle('online', Boolean(isOnline));
         });
 
@@ -3081,12 +3380,21 @@ Te amo, Jhonn 🤍`;
             presenceDocRef = doc(db, 'presence', userId);
             updatePresence(true);
             if (!presenceHeartbeat) {
-                presenceHeartbeat = setInterval(() => updatePresence(true), 30000);
+                // Reducido de 30s a 15s para heartbeat más frecuente (mejor tiempo real)
+                presenceHeartbeat = setInterval(() => updatePresence(true), 15000);
             }
             setDoc(visitsDocRef, {
                 byUser: { [currentUserName]: increment(1) },
                 lastVisit: serverTimestamp()
             }, { merge: true });
+
+            // Detectar cuando el usuario vuelve a estar activo (mousemove, click, etc)
+            const activityHandler = () => {
+                if (presenceDocRef) updatePresence(true);
+            };
+            document.addEventListener('mousemove', activityHandler, { passive: true });
+            document.addEventListener('click', activityHandler, { passive: true });
+            document.addEventListener('keydown', activityHandler, { passive: true });
         });
 
         window.addEventListener('pagehide', () => {
