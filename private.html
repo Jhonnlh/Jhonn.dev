@@ -3530,30 +3530,25 @@ Te amo, Jhonn 🤍`;
             const container = document.getElementById('notificationsContainer');
             const floatingContainer = document.getElementById('floatingNotifications');
             
-            // Notificación fija en la esquina
+            // Notificación fija en la esquina (desaparece automáticamente)
             const notification = document.createElement('div');
             notification.className = 'notification';
             notification.innerHTML = `
                 <span style="font-size: 1.2em; margin-right: 8px; display: inline-block;">${icon}</span>
                 <span>${message}</span>
-                <button type="button" style="margin-left: 10px; padding: 2px 6px; font-size: 0.8em; cursor: pointer; background: rgba(255,255,255,0.2); border: none; border-radius: 4px; color: inherit;">✕</button>
             `;
 
             container.appendChild(notification);
 
-            // Cerrar al hacer clic en el botón X
-            const closeBtn = notification.querySelector('button');
-            closeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                notification.classList.add('removing');
-                setTimeout(() => notification.remove(), 300);
-                if (floatingBtn) {
-                    floatingBtn.classList.add('removing');
-                    setTimeout(() => floatingBtn.remove(), 300);
+            // Desaparece automáticamente en 4 segundos
+            const autoCloseTimer = setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.classList.add('removing');
+                    setTimeout(() => notification.remove(), 300);
                 }
-            });
+            }, 4000);
 
-            // Ícono flotante clickeable
+            // Ícono flotante clickeable (persiste hasta interacción)
             const floatingBtn = document.createElement('button');
             floatingBtn.className = 'floating-notification';
             floatingBtn.innerHTML = icon;
@@ -3564,28 +3559,41 @@ Te amo, Jhonn 🤍`;
             // Mapping de emojis a secciones
             const sectionMap = {
                 '📸': 'galleryGrid',
-                '🎵': 'playlistList',  // Playlist
-                '💬': 'messagesList',  // Messages
-                '✨': 'momentsList',   // Moments
-                '📅': 'plansList',     // Plans
+                '🎬': 'galleryGrid',
+                '🎵': 'playlistList',
+                '💬': 'messagesList',
+                '✨': 'momentsList',
+                '📅': 'plansList',
             };
 
             // Obtener el target de scroll
             let targetSection = scrollTarget || sectionMap[icon];
 
+            // Enviar notificación push si está disponible
+            if ('serviceWorker' in navigator && 'Notification' in window && Notification.permission === 'granted') {
+                navigator.serviceWorker.ready.then((reg) => {
+                    reg.showNotification(message, {
+                        icon: icon,
+                        badge: icon,
+                        tag: 'jhonn-sol-notification',
+                        requireInteraction: true
+                    });
+                });
+            }
+
             floatingBtn.addEventListener('click', () => {
+                clearTimeout(autoCloseTimer);
                 if (targetSection) {
                     const element = document.getElementById(targetSection);
                     if (element) {
                         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        // Destacar la sección
                         element.parentElement?.classList?.add('highlight');
                         setTimeout(() => {
                             element.parentElement?.classList?.remove('highlight');
                         }, 2000);
                     }
                 }
-                // Cerrar notificación y botón flotante
+                // Eliminar notificaciones solo después del clic
                 notification.classList.add('removing');
                 floatingBtn.classList.add('removing');
                 setTimeout(() => {
@@ -4062,6 +4070,27 @@ Te amo, Jhonn 🤍`;
             if (!userId) return;
             presenceDocRef = doc(db, 'presence', userId);
             updatePresence(true);
+            
+            // Solicitar permisos para notificaciones push
+            if ('serviceWorker' in navigator && 'Notification' in window) {
+                if (Notification.permission === 'default') {
+                    Notification.requestPermission().then((permission) => {
+                        if (permission === 'granted' && 'serviceWorker' in navigator) {
+                            navigator.serviceWorker.ready.then((reg) => {
+                                reg.showNotification('Notificaciones activadas', {
+                                    icon: '🔔',
+                                    badge: '🔔',
+                                    body: 'Ahora recibirás notificaciones cuando el otro agregue contenido',
+                                    tag: 'jhonn-sol-welcome'
+                                });
+                            });
+                        }
+                    });
+                }
+                // Registrar service worker
+                navigator.serviceWorker.register('sw.js').catch(() => {});
+            }
+            
             if (!presenceHeartbeat) {
                 // Reducido de 30s a 15s para heartbeat más frecuente (mejor tiempo real)
                 presenceHeartbeat = setInterval(() => updatePresence(true), 15000);

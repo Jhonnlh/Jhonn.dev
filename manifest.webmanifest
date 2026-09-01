@@ -1,12 +1,28 @@
 {
-  "name": "Jhonn y Sol",
-  "short_name": "Jhonn y Sol",
-  "description": "Nuestro mundo de amor y momentos especiales.",
+  "name": "Jhonn y Sol - Nuestro Mundo",
+  "short_name": "Jhonn & Sol",
+  "description": "Nuestro mundo de amor, momentos especiales y conexión sin límites.",
   "start_url": "./private.html",
   "scope": "./",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#fff7f8",
   "theme_color": "#ec4899",
+  "categories": ["lifestyle", "productivity"],
+  "screenshots": [
+    {
+      "src": "icons/jhonn-sol-icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "icons/jhonn-sol-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "form_factor": "wide"
+    }
+  ],
   "icons": [
     {
       "src": "icons/jhonn-sol-icon.svg",
@@ -20,5 +36,62 @@
       "type": "image/svg+xml",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Galería",
+      "short_name": "Fotos",
+      "description": "Ver nuestras fotos y vídeos",
+      "url": "./private.html#galleryGrid",
+      "icons": [
+        {
+          "src": "icons/jhonn-sol-icon.svg",
+          "sizes": "192x192",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Playlist",
+      "short_name": "Música",
+      "description": "Escuchar nuestra música",
+      "url": "./private.html#playlistList",
+      "icons": [
+        {
+          "src": "icons/jhonn-sol-icon.svg",
+          "sizes": "192x192",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Mensajes",
+      "short_name": "Chats",
+      "description": "Leer nuestros mensajes",
+      "url": "./private.html#messagesList",
+      "icons": [
+        {
+          "src": "icons/jhonn-sol-icon.svg",
+          "sizes": "192x192",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false,
+  "share_target": {
+    "action": "./share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "titulo",
+      "text": "texto",
+      "files": [
+        {
+          "name": "archivo",
+          "accept": ["image/*", "video/*"]
+        }
+      ]
+    }
+  }
 }
