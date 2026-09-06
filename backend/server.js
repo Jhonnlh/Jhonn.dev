@@ -19,6 +19,17 @@ const adminMutationTables = new Set(['services', 'experience']);
 let lastSyncAt = null;
 let adminOnlineUntil = 0;
 const onlineChats = new Map();
+let presenceHeartbeat = null;
+
+async function updateBackendPresence(online) {
+  adminOnlineUntil = online ? Date.now() + 90000 : 0;
+  if (!firestore) return;
+  await firestore.collection('system').doc('presence').set({
+    online,
+    expiresAt: online ? Date.now() + 90000 : 0,
+    source: 'backend'
+  }, { merge: true });
+}
 
 async function runProjectsSync() {
   if (syncInProgress) return { skipped: true, reason: 'sync_in_progress' };
@@ -60,15 +71,17 @@ app.post('/api/auth/login', (request, response) => {
   const token = crypto.randomUUID();
   adminSessions.add(token);
   adminOnlineUntil = Date.now() + 90000;
+  void updateBackendPresence(true).catch(() => {});
   response.json({ ok: true, token });
 });
 
 app.post('/api/auth/logout', requireAdmin, (request, response) => {
   const token = request.headers.authorization?.replace('Bearer ', '');
   adminSessions.delete(token);
-  if (!adminSessions.size) {
-    adminOnlineUntil = 0;
-    if (firestore) void firestore.collection('system').doc('presence').set({ online: false, expiresAt: 0 });
+  if (adminSessions.size) {
+    adminOnlineUntil = Date.now() + 90000;
+  } else {
+    void updateBackendPresence(false).catch(() => {});
   }
   response.json({ ok: true });
 });
@@ -636,3 +649,13 @@ app.listen(port, () => {
     }, syncIntervalMs);
   }
 });
+
+async function closeBackend() {
+  if (presenceHeartbeat) clearInterval(presenceHeartbeat);
+  await updateBackendPresence(false).catch(() => {});
+  await pool.end().catch(() => {});
+  process.exit(0);
+}
+
+process.once('SIGINT', closeBackend);
+process.once('SIGTERM', closeBackend);

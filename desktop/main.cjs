@@ -1,10 +1,22 @@
 const { app, BrowserWindow } = require('electron');
 const { spawn } = require('node:child_process');
+const net = require('node:net');
 const path = require('node:path');
 
 let backendProcess;
+let ownsBackendProcess = false;
 
-function startBackend() {
+function isBackendRunning() {
+  return new Promise((resolve) => {
+    const socket = net.createConnection({ host: '127.0.0.1', port: 3000 });
+    socket.once('connect', () => { socket.destroy(); resolve(true); });
+    socket.once('error', () => resolve(false));
+  });
+}
+
+async function startBackendIfNeeded() {
+  if (await isBackendRunning()) return;
+
   const nodeExecutable = process.platform === 'win32'
     ? 'C:\\Program Files\\nodejs\\node.exe'
     : 'node';
@@ -14,6 +26,7 @@ function startBackend() {
     windowsHide: true,
     stdio: 'ignore'
   });
+  ownsBackendProcess = true;
 }
 
 function createWindow() {
@@ -33,8 +46,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  startBackend();
-  createWindow();
+  startBackendIfNeeded().finally(createWindow);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -42,10 +54,10 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
-  if (backendProcess && !backendProcess.killed) backendProcess.kill();
+  if (ownsBackendProcess && backendProcess && !backendProcess.killed) backendProcess.kill();
   if (process.platform !== 'darwin') app.quit();
 });
 
 app.on('before-quit', () => {
-  if (backendProcess && !backendProcess.killed) backendProcess.kill();
+  if (ownsBackendProcess && backendProcess && !backendProcess.killed) backendProcess.kill();
 });
