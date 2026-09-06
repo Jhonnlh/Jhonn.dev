@@ -170,15 +170,19 @@
         async function loadProjects() {
             try {
                 const localProjects = await loadProjectsFromLocalApi();
-                renderProjects(localProjects);
-                return;
-            } catch (_localError) {
-                try {
-                    const firebaseProjects = await loadProjectsFromFirebase();
-                    renderProjects(firebaseProjects);
-                } catch (_firebaseError) {
-                    projectsStatus.textContent = 'No se pudieron cargar los proyectos.';
+                if (localProjects.length) {
+                    renderProjects(localProjects);
+                    return;
                 }
+            } catch (_localError) {
+            }
+
+            try {
+                const firebaseProjects = await loadProjectsFromFirebase();
+                renderProjects(firebaseProjects);
+            } catch (firebaseError) {
+                console.error('No se pudieron cargar los proyectos desde Firebase:', firebaseError);
+                projectsStatus.textContent = 'No se pudieron cargar los proyectos.';
             }
         }
 
