@@ -7,7 +7,10 @@ import { pool } from './db.js';
 import { firebaseConfigured, firestore } from './firebase.js';
 import { syncMessagesFromFirebase, syncProjectsFromFirebase, syncProjectsToFirebase } from './sync.js';
 
-dotenv.config({ path: path.join(process.cwd(), '.env'), override: true });
+dotenv.config({
+  path: path.join(process.env.JHONN_CONFIG_DIR || process.cwd(), '.env'),
+  override: true
+});
 
 const app = express();
 const port = Number(process.env.PORT || 3000);

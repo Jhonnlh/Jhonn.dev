@@ -2,12 +2,14 @@
   "name": "jhonn-portfolio",
   "version": "1.0.0",
   "private": true,
+  "main": "desktop/main.cjs",
   "description": "Portafolio de Jhonn con API local y sincronización de datos.",
   "type": "module",
   "scripts": {
     "start": "node backend/server.js",
     "dev": "node --watch backend/server.js",
-    "desktop": "electron desktop/main.cjs"
+    "desktop": "electron desktop/main.cjs",
+    "build": "electron-builder --win nsis"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -17,6 +19,34 @@
     "mysql2": "^3.12.0"
   },
   "devDependencies": {
-    "electron": "^34.3.3"
+    "electron": "^34.3.3",
+    "electron-builder": "^25.1.8",
+    "sharp": "^0.33.5"
+  },
+  "build": {
+    "appId": "com.jhonn.portfolio-manager",
+    "productName": "Jhonn Portfolio Manager",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "desktop/**/*",
+      "backend/**/*",
+      "package.json",
+      "node_modules/**/*",
+      "!**/*.map"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/jhonn-portfolio-icon.png",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
   }
 }

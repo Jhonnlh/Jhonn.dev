@@ -22,7 +22,7 @@ async function startBackendIfNeeded() {
     : 'node';
   backendProcess = spawn(nodeExecutable, [path.join(__dirname, '..', 'backend', 'server.js')], {
     cwd: path.join(__dirname, '..'),
-    env: { ...process.env },
+    env: { ...process.env, JHONN_CONFIG_DIR: app.getPath('userData') },
     windowsHide: true,
     stdio: 'ignore'
   });
