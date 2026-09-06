@@ -54,9 +54,9 @@ self.addEventListener('notificationclick', (event) => {
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
       for (let i = 0; i < clientList.length; i++) {
-        if (clientList[i].url.includes('private.html')) return clientList[i].focus();
+        if (clientList[i].url.includes('index.html') || clientList[i].url.endsWith('/')) return clientList[i].focus();
       }
-      if (clients.openWindow) return clients.openWindow('/private.html');
+      if (clients.openWindow) return clients.openWindow('/index.html');
     })
   );
 });
