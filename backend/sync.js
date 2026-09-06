@@ -111,3 +111,47 @@ export async function syncProjectsToFirebase() {
 
   return { synced };
 }
+
+export async function syncMessagesFromFirebase() {
+  if (!firestore) {
+    throw new Error('Firebase no está configurado en el archivo .env.');
+  }
+
+  const snapshot = await firestore.collection('contactMessages').get();
+  let synced = 0;
+
+  for (const document of snapshot.docs) {
+    const data = document.data();
+    const createdAt = toDate(data.createdAt || data.created_at);
+    const updatedAt = toDate(data.updatedAt || data.updated_at || createdAt);
+    const status = ['new', 'read', 'archived'].includes(data.status) ? data.status : 'new';
+
+    await pool.execute(
+      `INSERT INTO messages
+        (id, name, email, phone, subject, message, status, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE
+        name = VALUES(name),
+        email = VALUES(email),
+        phone = VALUES(phone),
+        subject = VALUES(subject),
+        message = VALUES(message),
+        status = VALUES(status),
+        updated_at = VALUES(updated_at)`,
+      [
+        document.id,
+        cleanText(data.name),
+        cleanText(data.email),
+        cleanText(data.phone),
+        cleanText(data.subject),
+        cleanText(data.message),
+        status,
+        createdAt,
+        updatedAt
+      ]
+    );
+    synced += 1;
+  }
+
+  return { synced };
+}

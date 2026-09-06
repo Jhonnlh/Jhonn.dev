@@ -5,7 +5,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { pool } from './db.js';
 import { firebaseConfigured, firestore } from './firebase.js';
-import { syncProjectsFromFirebase, syncProjectsToFirebase } from './sync.js';
+import { syncMessagesFromFirebase, syncProjectsFromFirebase, syncProjectsToFirebase } from './sync.js';
 
 dotenv.config({ path: path.join(process.cwd(), '.env'), override: true });
 
@@ -26,9 +26,10 @@ async function runProjectsSync() {
   syncInProgress = true;
   try {
     const fromFirebase = await syncProjectsFromFirebase();
+    const messagesFromFirebase = await syncMessagesFromFirebase();
     const toFirebase = await syncProjectsToFirebase();
     lastSyncAt = new Date();
-    return { fromFirebase, toFirebase };
+    return { fromFirebase, messagesFromFirebase, toFirebase };
   } finally {
     syncInProgress = false;
   }
@@ -460,7 +461,9 @@ app.get('/api/messages', requireAdmin, async (_request, response) => {
       ...entry.data(),
       source: 'firebase'
     }));
-    response.json([...rows.map((row) => ({ ...row, source: 'mysql' })), ...remoteRows]);
+    const localRows = rows.map((row) => ({ ...row, source: 'mysql' }));
+    const localIds = new Set(localRows.map((row) => row.id));
+    response.json([...localRows, ...remoteRows.filter((row) => !localIds.has(row.id))]);
   } catch (error) {
     console.error('Could not load contact messages:', error.message);
     response.status(500).json({ error: 'No se pudieron cargar los mensajes.' });
