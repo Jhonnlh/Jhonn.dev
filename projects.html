@@ -57,46 +57,8 @@
                     </div>
                 </div>
 
-                <div class="projects-grid">
-                    <article class="project-card">
-                        <div class="project-visual" aria-label="Proyecto 1"></div>
-                        <div class="project-body">
-                            <div class="tags">
-                                <span class="tag">UI</span>
-                                <span class="tag">UX</span>
-                            </div>
-                            <h3>Brand Studio</h3>
-                            <p>Diseño de marca y sitio web para una agencia creativa con enfoque premium.</p>
-                            <a href="#" class="link-row">Ver proyecto <span>→</span></a>
-                        </div>
-                    </article>
-
-                    <article class="project-card">
-                        <div class="project-visual" aria-label="Proyecto 2"></div>
-                        <div class="project-body">
-                            <div class="tags">
-                                <span class="tag">Web</span>
-                                <span class="tag">Marketing</span>
-                            </div>
-                            <h3>Launch Agency</h3>
-                            <p>Landing page estratégica para lanzar una marca con un mensaje claro y fuerte.</p>
-                            <a href="#" class="link-row">Ver proyecto <span>→</span></a>
-                        </div>
-                    </article>
-
-                    <article class="project-card">
-                        <div class="project-visual" aria-label="Proyecto 3"></div>
-                        <div class="project-body">
-                            <div class="tags">
-                                <span class="tag">App</span>
-                                <span class="tag">E-commerce</span>
-                            </div>
-                            <h3>Nova Store</h3>
-                            <p>Experiencia digital moderna para comercio electrónico con alto foco en ventas.</p>
-                            <a href="#" class="link-row">Ver proyecto <span>→</span></a>
-                        </div>
-                    </article>
-                </div>
+                <p id="projectsStatus" role="status">Cargando proyectos...</p>
+                <div class="projects-grid" id="projectsGrid"></div>
             </div>
         </section>
     </main>
@@ -113,6 +75,114 @@
     </footer>
 
     <script src="theme.js"></script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js';
+        import {
+            collection,
+            getDocs,
+            getFirestore,
+            orderBy,
+            query
+        } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: 'AIzaSyBnThM2Mrd5pRGl6No6orE6z-Bc_89vfMM',
+            authDomain: 'jhonndev-6d73f.firebaseapp.com',
+            projectId: 'jhonndev-6d73f',
+            storageBucket: 'jhonndev-6d73f.firebasestorage.app',
+            messagingSenderId: '889527489759',
+            appId: '1:889527489759:web:d4739e9bff51f0b5d5c56a'
+        };
+
+        const firebaseApp = initializeApp(firebaseConfig);
+        const firestore = getFirestore(firebaseApp);
+        const projectsGrid = document.getElementById('projectsGrid');
+        const projectsStatus = document.getElementById('projectsStatus');
+
+        function createProjectCard(project) {
+            const article = document.createElement('article');
+            article.className = 'project-card';
+
+            const visual = document.createElement('div');
+            visual.className = 'project-visual';
+            visual.setAttribute('aria-label', `Imagen de ${project.title}`);
+            if (project.image_url) {
+                visual.style.backgroundImage = `url("${project.image_url}")`;
+            }
+
+            const body = document.createElement('div');
+            body.className = 'project-body';
+
+            const title = document.createElement('h3');
+            title.textContent = project.title;
+
+            const description = document.createElement('p');
+            description.textContent = project.description || 'Proyecto de diseño y desarrollo web.';
+
+            body.append(title, description);
+
+            if (project.project_url) {
+                const link = document.createElement('a');
+                link.className = 'link-row';
+                link.href = project.project_url;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.textContent = 'Ver proyecto →';
+                body.appendChild(link);
+            }
+
+            article.append(visual, body);
+            return article;
+        }
+
+        function renderProjects(projects) {
+            projectsGrid.replaceChildren(...projects.map(createProjectCard));
+            projectsStatus.textContent = projects.length
+                ? ''
+                : 'Todavía no hay proyectos guardados.';
+        }
+
+        async function loadProjectsFromLocalApi() {
+            const response = await fetch('http://localhost:3000/api/projects');
+            if (!response.ok) throw new Error('No se pudo consultar la API local.');
+            return response.json();
+        }
+
+        async function loadProjectsFromFirebase() {
+            const projectsQuery = query(
+                collection(firestore, 'projects'),
+                orderBy('createdAt', 'desc')
+            );
+            const snapshot = await getDocs(projectsQuery);
+            return snapshot.docs.map((document) => {
+                const data = document.data();
+                return {
+                    id: document.id,
+                    title: data.title || '',
+                    description: data.description || '',
+                    image_url: data.imageUrl || data.image_url || '',
+                    project_url: data.projectUrl || data.project_url || ''
+                };
+            });
+        }
+
+        async function loadProjects() {
+            try {
+                const localProjects = await loadProjectsFromLocalApi();
+                renderProjects(localProjects);
+                return;
+            } catch (_localError) {
+                try {
+                    const firebaseProjects = await loadProjectsFromFirebase();
+                    renderProjects(firebaseProjects);
+                } catch (_firebaseError) {
+                    projectsStatus.textContent = 'No se pudieron cargar los proyectos.';
+                }
+            }
+        }
+
+        loadProjects();
+    </script>
 </body>
 
 </html>
