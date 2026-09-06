@@ -152,7 +152,8 @@
                 messagingSenderId: '889527489759',
                 appId: '1:889527489759:web:d4739e9bff51f0b5d5c56a'
             };
-            const app = appModule.getApps().length ? appModule.getApp() : appModule.initializeApp(config);
+            const app = appModule.getApps().find((item) => item.name === 'contact-page')
+                || appModule.initializeApp(config, 'contact-page');
             return { firestore: firestoreModule.getFirestore(app), firestoreModule };
         }).catch(() => null);
         contactMeButton.addEventListener('click', () => {
