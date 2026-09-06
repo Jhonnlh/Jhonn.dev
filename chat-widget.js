@@ -17,7 +17,10 @@
     const app = appModule.getApps().length ? appModule.getApp() : appModule.initializeApp(config);
     firestore = firestoreModule.getFirestore(app);
     firestoreApi = firestoreModule;
-  }).catch(() => {});
+  }).catch((error) => {
+    console.error('Firebase chat initialization failed:', error);
+    return null;
+  });
   let conversationId = localStorage.getItem('jhonnChatConversationId') || '';
   let chatStarted = Boolean(conversationId);
 
@@ -92,7 +95,8 @@
       widget.querySelector('.chat-form textarea').disabled = !data.online;
       widget.querySelector('.chat-form button[type="submit"]').disabled = !data.online;
       widget.querySelector('.chat-form textarea').placeholder = data.online ? 'Escribe tu mensaje...' : 'El chat está cerrado ahora';
-    } catch (_error) {
+    } catch (error) {
+      console.error('Chat presence failed:', error);
       onlineLabel.textContent = 'No está en línea. Vuelve más tarde o deja tus datos.';
       contactLink.hidden = false;
     }
@@ -109,6 +113,17 @@
     try {
       await firestoreReady;
       if (firestore) {
+        const chatReference = firestoreApi.doc(firestore, 'onlineChats', conversationId);
+        const chatSnapshot = await firestoreApi.getDoc(chatReference);
+        if (!chatSnapshot.exists()) {
+          conversationId = '';
+          chatStarted = false;
+          firstMessageSent = false;
+          localStorage.removeItem('jhonnChatConversationId');
+          messages.replaceChildren();
+          showNameField();
+          return;
+        }
         const repliesQuery = firestoreApi.query(
           firestoreApi.collection(firestore, 'onlineChats', conversationId, 'replies'),
           firestoreApi.orderBy('createdAt', 'asc')
@@ -140,7 +155,9 @@
         bubble.textContent = reply.body;
         return bubble;
       }));
-    } catch (_error) {}
+    } catch (error) {
+      console.error('Chat replies failed:', error);
+    }
   }
 
   function showNameField() {
@@ -169,10 +186,20 @@
         if (conversationId) {
           chatReference = firestoreApi.doc(firestore, 'onlineChats', conversationId);
           const current = await firestoreApi.getDoc(chatReference);
-          if (!current.exists()) throw new Error('Chat finalizado.');
-          await firestoreApi.addDoc(firestoreApi.collection(chatReference, 'replies'), { sender: 'visitor', body: payload.message, createdAt: new Date() });
-          await firestoreApi.setDoc(chatReference, { updatedAt: new Date() }, { merge: true });
-        } else {
+          if (current.exists()) {
+            await firestoreApi.addDoc(firestoreApi.collection(chatReference, 'replies'), { sender: 'visitor', body: payload.message, createdAt: new Date() });
+            await firestoreApi.setDoc(chatReference, { updatedAt: new Date() }, { merge: true });
+          } else {
+            conversationId = '';
+            chatStarted = false;
+            firstMessageSent = false;
+            localStorage.removeItem('jhonnChatConversationId');
+            showNameField();
+            status.textContent = 'La conversación anterior terminó. Escribe tu nombre para iniciar otra.';
+            return;
+          }
+        }
+        if (!conversationId) {
           chatReference = await firestoreApi.addDoc(firestoreApi.collection(firestore, 'onlineChats'), { name: payload.name, subject: 'Chat online', active: true, createdAt: new Date(), updatedAt: new Date() });
           await firestoreApi.addDoc(firestoreApi.collection(chatReference, 'replies'), { sender: 'visitor', body: payload.message, createdAt: new Date() });
         }
@@ -206,8 +233,9 @@
         status.textContent = '';
       }
       loadReplies();
-    } catch (_error) {
-      showTemporaryStatus('No se pudo enviar. Comprueba tu conexión.');
+    } catch (error) {
+      console.error('Chat send failed:', error);
+      showTemporaryStatus(error?.message || 'No se pudo enviar. Comprueba tu conexión.');
     }
   });
 

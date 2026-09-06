@@ -77,7 +77,7 @@
     <script src="theme.js"></script>
     <script src="chat-widget.js?v=20260907"></script>
     <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js';
+        import { getApps, initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js';
         import {
             collection,
             getDocs,
@@ -95,7 +95,8 @@
             appId: '1:889527489759:web:d4739e9bff51f0b5d5c56a'
         };
 
-        const firebaseApp = initializeApp(firebaseConfig);
+        const firebaseApp = getApps().find((app) => app.name === 'projects-page')
+            || initializeApp(firebaseConfig, 'projects-page');
         const firestore = getFirestore(firebaseApp);
         const projectsGrid = document.getElementById('projectsGrid');
         const projectsStatus = document.getElementById('projectsStatus');

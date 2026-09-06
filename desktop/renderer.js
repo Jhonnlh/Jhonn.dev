@@ -20,6 +20,7 @@ const themeButton = document.getElementById('themeButton');
 let activeChatId = '';
 let activeChatKind = 'chat';
 let knownMessageIds = null;
+let messageListSignature = '';
 
 function showPanelNotification(message, type) {
   const container = document.getElementById('panelNotifications');
@@ -144,6 +145,12 @@ async function loadMessages() {
   }
   knownMessageIds = currentIds;
   document.getElementById('messagesCount').textContent = messages.filter((message) => message.status === 'new').length;
+  const nextSignature = JSON.stringify(messages.map((message) => `${message.id}:${message.status}:${message.updated_at || message.updatedAt || ''}`));
+  if (messageListSignature === nextSignature) {
+    await loadOnlineChats();
+    return;
+  }
+  messageListSignature = nextSignature;
   onlineMessagesList.replaceChildren();
   contactMessagesList.replaceChildren();
   const onlineMessages = [];
@@ -212,6 +219,9 @@ async function loadOnlineChats() {
   const response = await fetch(`${apiBase}/admin/chats`, { headers: authHeaders() });
   if (!response.ok) return;
   const chats = await response.json();
+  const signature = JSON.stringify(chats.map((chat) => `${chat.id}:${chat.updatedAt}:${chat.lastMessage}`));
+  if (loadOnlineChats.lastSignature === signature) return;
+  loadOnlineChats.lastSignature = signature;
   const chatButton = document.getElementById('panelFloatingChat');
   chatButton.dataset.count = chats.length;
   chatButton.classList.toggle('has-chats', chats.length > 0);

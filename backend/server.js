@@ -149,13 +149,15 @@ app.post('/api/chat/:id/end', async (request, response) => {
 
 app.get('/api/admin/chats', requireAdmin, async (_request, response) => {
   if (firestore) {
-    const snapshot = await firestore.collection('onlineChats').where('active', '==', true).get();
+    const snapshot = await firestore.collection('onlineChats').get();
     const chats = await Promise.all(snapshot.docs.map(async (entry) => {
+      if (entry.data().active === false) return null;
       const replies = await entry.ref.collection('replies').orderBy('createdAt', 'desc').limit(1).get();
       return { id: entry.id, ...entry.data(), lastMessage: replies.docs[0]?.data().body || '' };
     }));
-    chats.sort((first, second) => String(second.updatedAt || '').localeCompare(String(first.updatedAt || '')));
-    return response.json(chats);
+    const activeChats = chats.filter(Boolean);
+    activeChats.sort((first, second) => String(second.updatedAt || '').localeCompare(String(first.updatedAt || '')));
+    return response.json(activeChats);
   }
   response.json([...onlineChats.values()].map(({ replies, ...chat }) => ({ ...chat, lastMessage: replies.at(-1)?.body || '' })));
 });
