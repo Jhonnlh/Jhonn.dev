@@ -18,7 +18,7 @@
         const theme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', theme);
     </script>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=20260906" />
     <script src="pwa.js"></script>
 </head>
 
@@ -109,7 +109,7 @@
     </footer>
 
     <script src="theme.js"></script>
-    <script src="chat-widget.js"></script>
+    <script src="chat-widget.js?v=20260906"></script>
     <script>
         fetch('http://127.0.0.1:3000/api/public/content/about_content')
             .then((response) => response.ok ? response.json() : [])

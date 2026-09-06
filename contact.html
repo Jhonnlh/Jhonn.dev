@@ -18,7 +18,7 @@
         const theme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', theme);
     </script>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=20260906" />
     <script src="pwa.js"></script>
 </head>
 
@@ -94,7 +94,7 @@
                             <span>Desarrollo</span>
                             <span>Consultoría</span>
                         </div>
-                        <button id="contactMeButton" class="btn btn-primary" type="button">Contáctame</button>
+                        <button id="contactMeButton" class="btn btn-primary" type="button" aria-expanded="false">Contáctame</button>
                         <form id="contactForm" class="contact-form contact-form-inline" hidden>
                             <div class="form-intro">
                                 <span class="eyebrow">Cuéntame sobre ti</span>
@@ -135,13 +135,17 @@
     </footer>
 
     <script src="theme.js"></script>
-    <script src="chat-widget.js"></script>
+    <script src="chat-widget.js?v=20260906"></script>
     <script>
         const contactForm = document.getElementById('contactForm');
         const contactStatus = document.getElementById('contactStatus');
-        document.getElementById('contactMeButton').addEventListener('click', () => {
+        const contactMeButton = document.getElementById('contactMeButton');
+        contactMeButton.addEventListener('click', () => {
             contactForm.hidden = !contactForm.hidden;
-            if (!contactForm.hidden) contactForm.querySelector('input')?.focus();
+            const isOpen = !contactForm.hidden;
+            contactMeButton.textContent = isOpen ? 'Cerrar formulario' : 'Contáctame';
+            contactMeButton.setAttribute('aria-expanded', String(isOpen));
+            if (isOpen) contactForm.querySelector('input')?.focus();
         });
         contactForm.addEventListener('submit', async (event) => {
             event.preventDefault();

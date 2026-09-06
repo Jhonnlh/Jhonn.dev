@@ -38,6 +38,10 @@
     padding: 0;
 }
 
+[hidden] {
+    display: none !important;
+}
+
 html {
     scroll-behavior: smooth;
 }
@@ -727,12 +731,31 @@ p {
 
 .contact-grid {
     grid-template-columns: 1.1fr 0.9fr;
-    align-items: stretch;
+    align-items: start;
 }
 
 .contact-card {
     display: grid;
     gap: 18px;
+}
+
+.contact-grid > .contact-card:nth-child(2) {
+    position: relative;
+    z-index: 2;
+}
+
+.contact-form-inline {
+    position: absolute;
+    top: calc(100% + 14px);
+    left: 0;
+    right: 0;
+    z-index: 5;
+    margin-top: 0;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: var(--card);
+    box-shadow: var(--shadow);
+    padding: 20px;
 }
 
 .contact-list {
@@ -861,7 +884,7 @@ p {
 }
 
 .contact-form { display: grid; gap: 12px; }
-.contact-form-inline { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border); }
+.contact-form-inline { margin-top: 0; padding: 20px; border-top: 1px solid var(--border); }
 .form-intro { display: grid; gap: 5px; margin-bottom: 4px; }
 .form-intro p { color: var(--muted); font-size: .88rem; margin: 0; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -873,10 +896,10 @@ p {
 .contact-form select:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
 .contact-submit { justify-self: start; min-width: 130px; }
 .contact-form p { min-height: 20px; color: var(--muted); font-size: .84rem; margin: 0; }
-.chat-widget-button { position: fixed; left: 22px; bottom: 22px; z-index: 30; display: inline-flex; align-items: center; gap: 8px; min-width: 58px; height: 54px; border: 1px solid rgba(255,255,255,.16); border-radius: 999px; background: #111; color: #fff; box-shadow: 0 16px 36px rgba(0,0,0,.24); cursor: pointer; padding: 0 17px; font: inherit; font-weight: 800; transition: transform .2s ease, box-shadow .2s ease, background .2s ease; }
+.chat-widget-button { position: fixed; left: 22px; bottom: 22px; z-index: 30; display: inline-flex; align-items: center; gap: 8px; min-width: 58px; height: 54px; border: 1px solid var(--border); border-radius: 999px; background: var(--primary); color: var(--card); box-shadow: 0 16px 36px rgba(0,0,0,.24); cursor: pointer; padding: 0 17px; font: inherit; font-weight: 800; transition: transform .2s ease, box-shadow .2s ease, background .2s ease; }
 .chat-widget-button > span:first-child { display: grid; place-items: center; width: 22px; height: 22px; border: 1px solid currentColor; border-radius: 50%; font-size: 1.05rem; line-height: 1; }
 .chat-widget-button .chat-button-label { font-size: .78rem; letter-spacing: .02em; }
-.chat-widget-button:hover { transform: translateY(-3px); box-shadow: 0 20px 42px rgba(0,0,0,.3); background: #262626; }
+.chat-widget-button:hover { transform: translateY(-3px); box-shadow: 0 20px 42px rgba(0,0,0,.3); filter: brightness(1.18); }
 .chat-widget { position: fixed; left: 22px; bottom: 88px; z-index: 31; width: min(360px, calc(100vw - 32px)); border: 1px solid var(--border); border-radius: 16px; background: var(--card); box-shadow: 0 22px 60px rgba(0,0,0,.22); overflow: hidden; }
 .chat-widget[hidden] { display: none; }
 .chat-widget-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; background: var(--primary); color: var(--card); }
@@ -893,9 +916,9 @@ p {
 .chat-form button:disabled, .chat-form textarea:disabled { cursor: not-allowed; opacity: .5; }
 .chat-form p { min-height: 18px; }
 [data-theme="dark"] .chat-widget { border-color: rgba(255,255,255,.12); box-shadow: 0 24px 70px rgba(0,0,0,.55); }
-[data-theme="dark"] .chat-widget-button { background: #111; color: #fff; border-color: rgba(255,255,255,.16); box-shadow: 0 16px 36px rgba(0,0,0,.5); }
-[data-theme="dark"] .chat-widget-button:hover { background: #262626; }
-[data-theme="dark"] .chat-widget-header { background: #111; color: #fff; }
+[data-theme="dark"] .chat-widget-button { background: var(--primary); color: var(--card); border-color: rgba(255,255,255,.16); box-shadow: 0 16px 36px rgba(0,0,0,.5); }
+[data-theme="dark"] .chat-widget-button:hover { filter: brightness(1.18); }
+[data-theme="dark"] .chat-widget-header { background: var(--primary); color: var(--card); }
 [data-theme="dark"] .chat-messages { background: #111214; }
 [data-theme="dark"] .chat-message { background: #25272a; color: #f4f4f1; }
 [data-theme="dark"] .chat-message.admin { background: #f4f4f1; color: #111; }

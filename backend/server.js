@@ -4,7 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { pool } from './db.js';
-import { firebaseConfigured } from './firebase.js';
+import { firebaseConfigured, firestore } from './firebase.js';
 import { syncProjectsFromFirebase, syncProjectsToFirebase } from './sync.js';
 
 dotenv.config({ path: path.join(process.cwd(), '.env'), override: true });
@@ -65,25 +65,53 @@ app.post('/api/auth/login', (request, response) => {
 app.post('/api/auth/logout', requireAdmin, (request, response) => {
   const token = request.headers.authorization?.replace('Bearer ', '');
   adminSessions.delete(token);
-  if (!adminSessions.size) adminOnlineUntil = 0;
+  if (!adminSessions.size) {
+    adminOnlineUntil = 0;
+    if (firestore) void firestore.collection('system').doc('presence').set({ online: false, expiresAt: 0 });
+  }
   response.json({ ok: true });
 });
 
 app.post('/api/admin/presence', requireAdmin, (_request, response) => {
   adminOnlineUntil = Date.now() + 90000;
+  if (firestore) {
+    void firestore.collection('system').doc('presence').set({ online: true, expiresAt: Date.now() + 90000 });
+  }
   response.json({ ok: true, online: true });
 });
 
-app.get('/api/public/presence', (_request, response) => {
+app.get('/api/public/presence', async (_request, response) => {
+  if (firestore) {
+    const presence = await firestore.collection('system').doc('presence').get();
+    const data = presence.exists ? presence.data() : {};
+    return response.json({ online: Boolean(data.online && data.expiresAt > Date.now()) });
+  }
   response.json({ online: adminOnlineUntil > Date.now() });
 });
 
 // El chat online vive solo en memoria; no se guarda en MySQL.
-app.post('/api/chat', (request, response) => {
+app.post('/api/chat', async (request, response) => {
   const name = typeof request.body?.name === 'string' ? request.body.name.trim() : '';
   const email = typeof request.body?.email === 'string' ? request.body.email.trim() : '';
   const body = typeof request.body?.message === 'string' ? request.body.message.trim() : '';
   const existingId = typeof request.body?.conversationId === 'string' ? request.body.conversationId : '';
+  if (firestore) {
+    const chats = firestore.collection('onlineChats');
+    if (existingId) {
+      const reference = chats.doc(existingId);
+      const snapshot = await reference.get();
+      if (!snapshot.exists) return response.status(404).json({ error: 'Chat finalizado.' });
+      if (!body) return response.status(400).json({ error: 'Escribe un mensaje.' });
+      await reference.collection('replies').add({ sender: 'visitor', body, createdAt: new Date() });
+      await reference.set({ updatedAt: new Date() }, { merge: true });
+      return response.json({ ok: true, id: existingId, continued: true });
+    }
+    if (!name || !body) return response.status(400).json({ error: 'Nombre y mensaje son obligatorios.' });
+    const reference = chats.doc();
+    await reference.set({ name, email, subject: 'Chat online', createdAt: new Date(), updatedAt: new Date(), active: true });
+    await reference.collection('replies').add({ sender: 'visitor', body, createdAt: new Date() });
+    return response.status(201).json({ ok: true, id: reference.id });
+  }
   if (existingId && onlineChats.has(existingId)) {
     if (!body) return response.status(400).json({ error: 'Escribe un mensaje.' });
     const chat = onlineChats.get(existingId);
@@ -98,27 +126,63 @@ app.post('/api/chat', (request, response) => {
   response.status(201).json({ ok: true, id });
 });
 
-app.get('/api/chat/:id/replies', (request, response) => {
+app.get('/api/chat/:id/replies', async (request, response) => {
+  if (firestore) {
+    const snapshot = await firestore.collection('onlineChats').doc(request.params.id).get();
+    if (!snapshot.exists || snapshot.data().active === false) return response.status(404).json({ error: 'Chat finalizado.' });
+    const replies = await snapshot.ref.collection('replies').orderBy('createdAt', 'asc').get();
+    return response.json(replies.docs.map((entry) => entry.data()));
+  }
   const chat = onlineChats.get(request.params.id);
   if (!chat) return response.status(404).json({ error: 'Chat finalizado.' });
   response.json(chat.replies);
 });
 
-app.post('/api/chat/:id/end', (request, response) => {
+app.post('/api/chat/:id/end', async (request, response) => {
+  if (firestore) {
+    await firestore.collection('onlineChats').doc(request.params.id).delete();
+    return response.json({ ok: true, ended: true });
+  }
   response.json({ ok: onlineChats.delete(request.params.id), ended: true });
 });
 
-app.get('/api/admin/chats', requireAdmin, (_request, response) => {
+app.get('/api/admin/chats', requireAdmin, async (_request, response) => {
+  if (firestore) {
+    const snapshot = await firestore.collection('onlineChats').where('active', '==', true).get();
+    const chats = await Promise.all(snapshot.docs.map(async (entry) => {
+      const replies = await entry.ref.collection('replies').orderBy('createdAt', 'desc').limit(1).get();
+      return { id: entry.id, ...entry.data(), lastMessage: replies.docs[0]?.data().body || '' };
+    }));
+    chats.sort((first, second) => String(second.updatedAt || '').localeCompare(String(first.updatedAt || '')));
+    return response.json(chats);
+  }
   response.json([...onlineChats.values()].map(({ replies, ...chat }) => ({ ...chat, lastMessage: replies.at(-1)?.body || '' })));
 });
 
-app.get('/api/admin/chats/:id/replies', requireAdmin, (request, response) => {
+app.get('/api/admin/chats/:id/replies', requireAdmin, async (request, response) => {
+  if (firestore) {
+    const reference = firestore.collection('onlineChats').doc(request.params.id);
+    const snapshot = await reference.get();
+    if (!snapshot.exists) return response.status(404).json({ error: 'Chat finalizado.' });
+    const replies = await reference.collection('replies').orderBy('createdAt', 'asc').get();
+    return response.json(replies.docs.map((entry) => entry.data()));
+  }
   const chat = onlineChats.get(request.params.id);
   if (!chat) return response.status(404).json({ error: 'Chat finalizado.' });
   response.json(chat.replies);
 });
 
-app.post('/api/admin/chats/:id/replies', requireAdmin, (request, response) => {
+app.post('/api/admin/chats/:id/replies', requireAdmin, async (request, response) => {
+  if (firestore) {
+    const body = typeof request.body?.body === 'string' ? request.body.body.trim() : '';
+    const reference = firestore.collection('onlineChats').doc(request.params.id);
+    const snapshot = await reference.get();
+    if (!snapshot.exists) return response.status(404).json({ error: 'Chat finalizado.' });
+    if (!body) return response.status(400).json({ error: 'La respuesta no puede estar vacía.' });
+    await reference.collection('replies').add({ sender: 'admin', body, createdAt: new Date() });
+    await reference.set({ updatedAt: new Date() }, { merge: true });
+    return response.status(201).json({ ok: true });
+  }
   const chat = onlineChats.get(request.params.id);
   const body = typeof request.body?.body === 'string' ? request.body.body.trim() : '';
   if (!chat) return response.status(404).json({ error: 'Chat finalizado.' });
@@ -128,7 +192,14 @@ app.post('/api/admin/chats/:id/replies', requireAdmin, (request, response) => {
   response.status(201).json({ ok: true });
 });
 
-app.delete('/api/admin/chats/:id', requireAdmin, (request, response) => {
+app.delete('/api/admin/chats/:id', requireAdmin, async (request, response) => {
+  if (firestore) {
+    const reference = firestore.collection('onlineChats').doc(request.params.id);
+    const replies = await reference.collection('replies').get();
+    await Promise.all(replies.docs.map((entry) => entry.ref.delete()));
+    await reference.delete();
+    return response.json({ ok: true, ended: true });
+  }
   response.json({ ok: onlineChats.delete(request.params.id), ended: true });
 });
 
