@@ -24,7 +24,7 @@ function showInstallPrompt() {
     installBtn = document.createElement('button');
     installBtn.id = 'installAppBtn';
     installBtn.textContent = '📱 Instalar en el móvil';
-    installBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; padding: 10px 16px; background: linear-gradient(135deg, #ec4899, #f472b6); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; z-index: 999; box-shadow: 0 4px 12px rgba(236, 72, 153, 0.4); font-size: 14px;';
+    installBtn.style.cssText = 'position: fixed; bottom: 20px; right: 20px; padding: 10px 16px; background: #111111; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; z-index: 999; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22); font-size: 14px;';
     installBtn.addEventListener('click', handleInstallClick);
     document.body.appendChild(installBtn);
   }

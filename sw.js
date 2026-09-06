@@ -1,9 +1,9 @@
-const CACHE_NAME = 'jhonn-sol-shell-v2';
+const CACHE_NAME = 'jhonn-portfolio-shell-v3';
 const APP_SHELL = [
   './style.css',
   './manifest.webmanifest',
-  './icons/jhonn-sol-icon.svg',
-  './icons/jhonn-sol-icon-maskable.svg'
+  './icons/jhonn-icon.svg',
+  './icons/jhonn-icon-maskable.svg'
 ];
 
 self.addEventListener('install', (event) => {
@@ -39,9 +39,9 @@ self.addEventListener('push', (event) => {
   const title = data.title || 'Jhonn & Sol';
   const options = {
     body: data.body || 'Nuevo mensaje',
-    icon: data.icon || '❤️',
-    badge: data.badge || '❤️',
-    tag: 'jhonn-sol-notification',
+    icon: data.icon || './icons/jhonn-icon.svg',
+    badge: data.badge || './icons/jhonn-icon.svg',
+    tag: 'jhonn-portfolio-notification',
     requireInteraction: true
   };
   event.waitUntil(self.registration.showNotification(title, options));
