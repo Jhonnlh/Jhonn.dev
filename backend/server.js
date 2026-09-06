@@ -453,7 +453,14 @@ app.get('/api/messages', requireAdmin, async (_request, response) => {
        WHERE deleted_at IS NULL
        ORDER BY created_at DESC`
     );
-    response.json(rows);
+    if (!firestore) return response.json(rows);
+    const remote = await firestore.collection('contactMessages').get();
+    const remoteRows = remote.docs.map((entry) => ({
+      id: entry.id,
+      ...entry.data(),
+      source: 'firebase'
+    }));
+    response.json([...rows.map((row) => ({ ...row, source: 'mysql' })), ...remoteRows]);
   } catch (error) {
     console.error('Could not load contact messages:', error.message);
     response.status(500).json({ error: 'No se pudieron cargar los mensajes.' });
@@ -462,6 +469,10 @@ app.get('/api/messages', requireAdmin, async (_request, response) => {
 
 app.patch('/api/messages/:id/read', requireAdmin, async (request, response) => {
   try {
+    if (request.query.source === 'firebase' && firestore) {
+      await firestore.collection('contactMessages').doc(request.params.id).set({ status: 'read', updatedAt: new Date() }, { merge: true });
+      return response.json({ ok: true, id: request.params.id, status: 'read' });
+    }
     const [result] = await pool.execute(
       `UPDATE messages
        SET status = 'read', updated_at = UTC_TIMESTAMP()
@@ -480,6 +491,10 @@ app.patch('/api/messages/:id/read', requireAdmin, async (request, response) => {
 });
 
 app.patch('/api/messages/:id/archive', requireAdmin, async (request, response) => {
+  if (request.query.source === 'firebase' && firestore) {
+    await firestore.collection('contactMessages').doc(request.params.id).set({ status: 'archived', updatedAt: new Date() }, { merge: true });
+    return response.json({ ok: true, id: request.params.id, status: 'archived' });
+  }
   const [result] = await pool.execute(
     `UPDATE messages SET status = 'archived', updated_at = UTC_TIMESTAMP() WHERE id = ? AND deleted_at IS NULL`,
     [request.params.id]
@@ -489,6 +504,10 @@ app.patch('/api/messages/:id/archive', requireAdmin, async (request, response) =
 });
 
 app.delete('/api/messages/:id', requireAdmin, async (request, response) => {
+  if (request.query.source === 'firebase' && firestore) {
+    await firestore.collection('contactMessages').doc(request.params.id).delete();
+    return response.json({ ok: true, id: request.params.id });
+  }
   const [result] = await pool.execute(
     `UPDATE messages SET deleted_at = UTC_TIMESTAMP(), updated_at = UTC_TIMESTAMP() WHERE id = ? AND deleted_at IS NULL`,
     [request.params.id]

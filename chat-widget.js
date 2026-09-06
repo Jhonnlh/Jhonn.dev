@@ -6,14 +6,15 @@
     import('https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js'),
     import('https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js')
   ]).then(([appModule, firestoreModule]) => {
-    const app = appModule.initializeApp({
+    const config = {
       apiKey: 'AIzaSyBnThM2Mrd5pRGl6No6orE6z-Bc_89vfMM',
       authDomain: 'jhonndev-6d73f.firebaseapp.com',
       projectId: 'jhonndev-6d73f',
       storageBucket: 'jhonndev-6d73f.firebasestorage.app',
       messagingSenderId: '889527489759',
       appId: '1:889527489759:web:d4739e9bff51f0b5d5c56a'
-    });
+    };
+    const app = appModule.getApps().length ? appModule.getApp() : appModule.initializeApp(config);
     firestore = firestoreModule.getFirestore(app);
     firestoreApi = firestoreModule;
   }).catch(() => {});

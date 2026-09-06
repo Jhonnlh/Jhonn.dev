@@ -176,7 +176,7 @@ async function loadMessages() {
       readButton.type = 'button';
       readButton.textContent = 'Marcar como leído';
       readButton.addEventListener('click', async () => {
-        await fetch(`${apiBase}/messages/${encodeURIComponent(message.id)}/read`, { method: 'PATCH', headers: authHeaders() });
+        await fetch(`${apiBase}/messages/${encodeURIComponent(message.id)}/read?source=${message.source || 'mysql'}`, { method: 'PATCH', headers: authHeaders() });
         await loadMessages();
       });
       item.appendChild(readButton);
@@ -186,7 +186,7 @@ async function loadMessages() {
     archiveButton.type = 'button';
     archiveButton.textContent = 'Archivar';
     archiveButton.addEventListener('click', async () => {
-      await fetch(`${apiBase}/messages/${encodeURIComponent(message.id)}/archive`, { method: 'PATCH', headers: { Authorization: `Bearer ${authToken}` } });
+      await fetch(`${apiBase}/messages/${encodeURIComponent(message.id)}/archive?source=${message.source || 'mysql'}`, { method: 'PATCH', headers: { Authorization: `Bearer ${authToken}` } });
       await loadMessages();
     });
     const deleteButton = document.createElement('button');
@@ -195,7 +195,7 @@ async function loadMessages() {
     deleteButton.textContent = 'Eliminar';
     deleteButton.addEventListener('click', async () => {
       if (!window.confirm('¿Eliminar este mensaje?')) return;
-      await fetch(`${apiBase}/messages/${encodeURIComponent(message.id)}`, { method: 'DELETE', headers: { Authorization: `Bearer ${authToken}` } });
+      await fetch(`${apiBase}/messages/${encodeURIComponent(message.id)}?source=${message.source || 'mysql'}`, { method: 'DELETE', headers: { Authorization: `Bearer ${authToken}` } });
       await loadMessages();
     });
     item.append(archiveButton, deleteButton);
