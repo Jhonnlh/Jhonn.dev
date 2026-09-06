@@ -107,6 +107,32 @@
     </footer>
 
     <script src="theme.js"></script>
+    <script src="chat-widget.js"></script>
+    <script>
+        fetch('http://127.0.0.1:3000/api/public/content/experience')
+            .then((response) => response.ok ? response.json() : [])
+            .then((items) => {
+                if (!items.length) return;
+                const timeline = document.querySelector('.timeline');
+                timeline.replaceChildren(...items.map((item) => {
+                    const article = document.createElement('article');
+                    article.className = 'timeline-item';
+                    const year = document.createElement('div');
+                    year.className = 'year';
+                    year.textContent = `${item.start_year} - ${item.end_year || 'Actualidad'}`;
+                    const role = document.createElement('h3');
+                    role.textContent = item.role;
+                    const description = document.createElement('p');
+                    description.textContent = item.description;
+                    const skills = document.createElement('div');
+                    skills.className = 'skill-list';
+                    const values = Array.isArray(item.skills) ? item.skills : JSON.parse(item.skills || '[]');
+                    values.forEach((skill) => { const tag = document.createElement('span'); tag.textContent = skill; skills.appendChild(tag); });
+                    article.append(year, role, description, skills);
+                    return article;
+                }));
+            })
+            .catch(() => {});
 </body>
 
 </html>

@@ -1,6 +1,8 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
 import { applicationDefault, cert, getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
+
+dotenv.config({ override: true });
 
 const hasJsonCredentials = Boolean(process.env.GOOGLE_APPLICATION_CREDENTIALS);
 const hasEnvCredentials = Boolean(

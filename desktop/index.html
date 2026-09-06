@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jhonn Portfolio Manager</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <section id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <span class="eyebrow">Jhonn.dev</span>
+      <h1>Portfolio Manager</h1>
+      <p>Accede al panel local para gestionar tu contenido.</p>
+      <form id="loginForm" class="login-form">
+        <label>Usuario<input id="loginUser" autocomplete="username" required></label>
+        <label>Contraseña<input id="loginPassword" type="password" autocomplete="current-password" required></label>
+        <button type="submit">Entrar al panel</button>
+        <p id="loginFeedback" class="feedback" role="alert"></p>
+      </form>
+    </div>
+  </section>
+
+  <main id="appShell" class="shell" hidden>
+    <div id="panelNotifications" class="panel-notifications" aria-live="polite"></div>
+    <header class="topbar">
+      <div>
+        <span class="eyebrow">Jhonn.dev</span>
+        <h1>Portfolio Manager</h1>
+      </div>
+      <div class="topbar-actions">
+        <button id="themeButton" class="button-secondary" type="button" aria-label="Cambiar tema">Modo oscuro</button>
+        <div id="connectionStatus" class="status">Comprobando conexiones...</div>
+      </div>
+    </header>
+
+    <nav class="dashboard-nav" aria-label="Secciones del panel">
+      <button class="dashboard-tab active" data-view="overview" type="button">Resumen</button>
+      <button class="dashboard-tab" data-view="projects" type="button">Proyectos</button>
+      <button class="dashboard-tab" data-view="messages" type="button">Mensajes</button>
+      <button class="dashboard-tab" data-view="content" type="button">Contenido</button>
+      <button id="logoutButton" class="button-secondary" type="button">Salir</button>
+    </nav>
+
+    <section id="overview" class="overview-grid" aria-label="Resumen">
+      <article class="stat-card"><span>Proyectos</span><strong id="projectsCount">0</strong></article>
+      <article class="stat-card"><span>Servicios</span><strong id="servicesCount">0</strong></article>
+      <article class="stat-card"><span>Experiencia</span><strong id="experienceCount">0</strong></article>
+      <article class="stat-card"><span>Mensajes nuevos</span><strong id="messagesCount">0</strong></article>
+    </section>
+
+    <section class="intro">
+      <p>Administra el contenido del portafolio y sincroniza tus datos locales con Firebase.</p>
+      <button id="syncButton" type="button">Sincronizar ahora</button>
+    </section>
+
+    <section class="panel view-panel" data-view-panel="projects" aria-labelledby="projectsHeading" hidden>
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">Contenido</span>
+          <h2 id="projectsHeading">Proyectos</h2>
+        </div>
+        <button id="reloadButton" class="button-secondary" type="button">Actualizar</button>
+      </div>
+      <p id="feedback" class="feedback" role="status"></p>
+      <div id="projectsList" class="projects-list"></div>
+    </section>
+
+    <section class="panel form-panel view-panel" data-view-panel="projects" aria-labelledby="formHeading" hidden>
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">Editor</span>
+          <h2 id="formHeading">Nuevo proyecto</h2>
+        </div>
+      </div>
+      <form id="projectForm" class="project-form">
+        <input id="projectId" type="hidden">
+        <label>Título<input id="projectTitle" name="title" required maxlength="255"></label>
+        <label>Descripción<textarea id="projectDescription" name="description" rows="4"></textarea></label>
+        <label>URL de imagen<input id="projectImageUrl" name="imageUrl" type="url"></label>
+        <label>URL del proyecto<input id="projectUrl" name="projectUrl" type="url"></label>
+        <div class="form-actions">
+          <button type="submit">Guardar proyecto</button>
+          <button id="cancelButton" class="button-secondary" type="button">Cancelar</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel form-panel view-panel" data-view-panel="messages" aria-labelledby="messagesHeading" hidden>
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">Contacto</span>
+          <h2 id="messagesHeading">Mensajes</h2>
+        </div>
+        <button id="reloadMessagesButton" class="button-secondary" type="button">Actualizar</button>
+      </div>
+      <div class="message-columns">
+        <section class="message-window" aria-labelledby="onlineMessagesHeading">
+          <div class="message-window-heading"><span class="eyebrow">Conversación</span><h3 id="onlineMessagesHeading">Chat online</h3></div>
+          <div id="onlineMessagesList" class="messages-list"></div>
+        </section>
+        <section class="message-window" aria-labelledby="contactMessagesHeading">
+          <div class="message-window-heading"><span class="eyebrow">Solicitudes</span><h3 id="contactMessagesHeading">Formularios de contacto</h3></div>
+          <div id="contactMessagesList" class="messages-list"></div>
+        </section>
+      </div>
+    </section>
+
+    <section id="activeChatPanel" class="panel form-panel active-chat-panel" aria-labelledby="activeChatHeading" hidden>
+      <div class="panel-heading"><div><span class="eyebrow">Conversación</span><h2 id="activeChatHeading">Chat seleccionado</h2></div><button id="closeActiveChat" class="button-secondary" type="button">Cerrar</button></div>
+      <div id="panelChatMessages" class="panel-chat-messages"></div>
+      <form id="panelReplyForm" class="reply-form"><input id="panelReplyInput" required placeholder="Escribe una respuesta..." /><button type="submit">Enviar</button></form>
+    </section>
+    <button id="panelFloatingChat" class="panel-floating-chat" type="button" aria-label="Abrir conversación">💬</button>
+
+    <section class="panel form-panel view-panel" data-view-panel="content" aria-labelledby="contentHeading" hidden>
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">Contenido</span>
+          <h2 id="contentHeading">Contenido administrable</h2>
+        </div>
+      </div>
+      <p id="contentFeedback" class="feedback">Contenido administrable.</p>
+      <div class="content-status" id="contentStatus"></div>
+      <div id="contentLists" class="content-lists"></div>
+      <div class="content-editors">
+        <form id="serviceForm" class="content-form">
+          <h3>Servicio</h3>
+          <input id="serviceId" type="hidden">
+          <label>Título<input id="serviceTitle" required></label>
+          <label>Descripción<textarea id="serviceDescription" rows="3" required></textarea></label>
+          <label>Características, separadas por coma<input id="serviceFeatures"></label>
+          <div class="form-actions"><button type="submit">Guardar servicio</button><button id="serviceCancel" class="button-secondary" type="button">Cancelar</button></div>
+        </form>
+        <form id="experienceForm" class="content-form">
+          <h3>Experiencia</h3>
+          <input id="experienceId" type="hidden">
+          <label>Puesto<input id="experienceRole" required></label>
+          <label>Empresa<input id="experienceCompany"></label>
+          <label>Descripción<textarea id="experienceDescription" rows="3" required></textarea></label>
+          <div class="year-fields"><label>Inicio<input id="experienceStart" type="number" required></label><label>Fin<input id="experienceEnd" type="number"></label></div>
+          <label>Habilidades, separadas por coma<input id="experienceSkills"></label>
+          <div class="form-actions"><button type="submit">Guardar experiencia</button><button id="experienceCancel" class="button-secondary" type="button">Cancelar</button></div>
+        </form>
+        <form id="aboutForm" class="content-form">
+          <h3>Sobre mí</h3>
+          <label>Título<input id="aboutTitle" required></label>
+          <label>Descripción<textarea id="aboutDescription" rows="2" required></textarea></label>
+          <label>Biografía<textarea id="aboutBiography" rows="4" required></textarea></label>
+          <label>URL de foto<input id="aboutPhotoUrl" type="url"></label>
+          <button type="submit">Guardar información</button>
+        </form>
+        <form id="settingsForm" class="content-form">
+          <h3>Configuración del sitio</h3>
+          <label>Nombre del sitio<input id="settingsSiteName" required></label>
+          <label>Título principal<input id="settingsHeroTitle" required></label>
+          <label>Descripción principal<textarea id="settingsHeroDescription" rows="3" required></textarea></label>
+          <label>Correo<input id="settingsEmail" type="email" required></label>
+          <label>Ubicación<input id="settingsLocation" required></label>
+          <label>GitHub<input id="settingsGithub"></label>
+          <label>LinkedIn<input id="settingsLinkedin"></label>
+          <label>Instagram<input id="settingsInstagram"></label>
+          <button type="submit">Guardar configuración</button>
+        </form>
+      </div>
+    </section>
+  </main>
+  <script src="renderer.js"></script>
+</body>
+</html>

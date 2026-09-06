@@ -85,6 +85,14 @@ export async function syncProjectsToFirebase() {
       ? toDate(remoteData.updatedAt || remoteData.updated_at)
       : null;
 
+    if (project.deleted_at) {
+      if (!remoteUpdatedAt || remoteUpdatedAt <= localUpdatedAt) {
+        await reference.delete();
+        synced += 1;
+      }
+      continue;
+    }
+
     if (remoteUpdatedAt && remoteUpdatedAt > localUpdatedAt) {
       continue;
     }

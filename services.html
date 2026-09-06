@@ -107,6 +107,31 @@
     </footer>
 
     <script src="theme.js"></script>
+    <script src="chat-widget.js"></script>
+    <script>
+        fetch('http://127.0.0.1:3000/api/public/content/services')
+            .then((response) => response.ok ? response.json() : [])
+            .then((services) => {
+                if (!services.length) return;
+                const grid = document.querySelector('.services-grid');
+                grid.replaceChildren(...services.map((service) => {
+                    const article = document.createElement('article');
+                    article.className = 'service-card';
+                    const icon = document.createElement('div');
+                    icon.className = 'service-icon';
+                    icon.textContent = service.icon || '✦';
+                    const title = document.createElement('h3');
+                    title.textContent = service.title;
+                    const description = document.createElement('p');
+                    description.textContent = service.description;
+                    const list = document.createElement('ul');
+                    const features = Array.isArray(service.features) ? service.features : JSON.parse(service.features || '[]');
+                    features.forEach((feature) => { const item = document.createElement('li'); item.textContent = feature; list.appendChild(item); });
+                    article.append(icon, title, description, list);
+                    return article;
+                }));
+            })
+            .catch(() => {});
 </body>
 
 </html>

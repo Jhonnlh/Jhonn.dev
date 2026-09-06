@@ -109,6 +109,23 @@
     </footer>
 
     <script src="theme.js"></script>
+    <script src="chat-widget.js"></script>
+    <script>
+        fetch('http://127.0.0.1:3000/api/public/content/about_content')
+            .then((response) => response.ok ? response.json() : [])
+            .then((items) => {
+                const about = items[0];
+                if (!about) return;
+                const heading = document.querySelector('.section-heading h2');
+                const summary = document.querySelector('.section-heading > p');
+                const biography = document.querySelector('.about-copy .lead');
+                if (heading) heading.textContent = about.title;
+                if (summary) summary.textContent = about.description;
+                if (biography) biography.textContent = about.biography;
+                const visual = document.querySelector('.about-visual');
+                if (visual && about.photo_url) visual.style.backgroundImage = `url("${about.photo_url}")`;
+            })
+            .catch(() => {});
 </body>
 
 </html>

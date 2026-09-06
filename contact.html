@@ -94,7 +94,29 @@
                             <span>Desarrollo</span>
                             <span>Consultoría</span>
                         </div>
-                        <a class="btn btn-primary" href="mailto:jhonn@portfolio.dev">Contáctame</a>
+                        <button id="contactMeButton" class="btn btn-primary" type="button">Contáctame</button>
+                        <form id="contactForm" class="contact-form contact-form-inline" hidden>
+                            <div class="form-intro">
+                                <span class="eyebrow">Cuéntame sobre ti</span>
+                                <p>Déjame tus datos y me pondré en contacto contigo pronto.</p>
+                            </div>
+                            <div class="form-row">
+                                <label>Nombre completo<input name="name" autocomplete="name" required maxlength="120" placeholder="Tu nombre" /></label>
+                                <label>Correo electrónico<input name="email" type="email" autocomplete="email" required maxlength="255" placeholder="tu@correo.com" /></label>
+                            </div>
+                            <div class="form-row">
+                                <label>Teléfono <span>(opcional)</span><input name="phone" type="tel" autocomplete="tel" maxlength="40" placeholder="+51 900 000 000" /></label>
+                                <label>¿Qué necesitas?<select name="subject" required><option value="" disabled selected>Selecciona una opción</option><option>Diseño web</option><option>Desarrollo web</option><option>Branding</option><option>Consultoría</option><option>Otro</option></select></label>
+                            </div>
+                            <label>Cuéntame brevemente<textarea name="message" required rows="4" placeholder="Escribe aquí los detalles de tu proyecto..."></textarea></label>
+                            <button class="btn btn-primary contact-submit" type="submit">Enviar</button>
+                            <p id="contactStatus" role="status"></p>
+                        </form>
+                    </div>
+
+                    <div class="contact-card contact-form-card">
+                        <h3>Atención personalizada</h3>
+                        <p>Cuéntame qué necesitas y revisaré tu mensaje desde el panel.</p>
                     </div>
                 </div>
             </div>
@@ -113,6 +135,36 @@
     </footer>
 
     <script src="theme.js"></script>
+    <script src="chat-widget.js"></script>
+    <script>
+        const contactForm = document.getElementById('contactForm');
+        const contactStatus = document.getElementById('contactStatus');
+        document.getElementById('contactMeButton').addEventListener('click', () => {
+            contactForm.hidden = !contactForm.hidden;
+            if (!contactForm.hidden) contactForm.querySelector('input')?.focus();
+        });
+        contactForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(contactForm);
+            const payload = Object.fromEntries(formData.entries());
+            contactStatus.textContent = 'Enviando...';
+
+            try {
+                const response = await fetch('http://127.0.0.1:3000/api/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'No se pudo enviar.');
+                contactForm.reset();
+                contactStatus.textContent = 'Mensaje enviado. Pronto estaremos en contacto.';
+            } catch (_error) {
+                contactStatus.textContent = 'No se pudo enviar ahora. Escríbeme a jhonn@portfolio.dev.';
+            }
+        });
+
+    </script>
 </body>
 
 </html>

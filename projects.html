@@ -75,6 +75,7 @@
     </footer>
 
     <script src="theme.js"></script>
+    <script src="chat-widget.js"></script>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js';
         import {
@@ -154,7 +155,7 @@
                 orderBy('createdAt', 'desc')
             );
             const snapshot = await getDocs(projectsQuery);
-            return snapshot.docs.map((document) => {
+            return snapshot.docs.filter((document) => !document.data().deletedAt).map((document) => {
                 const data = document.data();
                 return {
                     id: document.id,
